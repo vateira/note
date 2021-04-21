@@ -1,0 +1,28 @@
+baseURL = "http://example.org/"
+languageCode = "ja_jp"
+title = "vateira"
+theme = "hugo-notepadium"
+
+
+
+[params]
+    style = "dark"
+    robots = "noindex,nofollow"
+    
+[params.profile]
+    enable = true
+    name = "vateira"
+    bio = "webサービス、モバイルアプリ中心のプロマネ兼ソフトウェアエンジニア。"
+    email = "vateira@outlook.jp"
+
+[params.comments]
+    enable = true
+
+
+[[params.nav.custom]]
+    title = "これまでの仕事の例"
+    url = "/posts/works"
+
+[[params.nav.custom]]
+    title = "お仕事について"
+    url = "/posts/jobs"
