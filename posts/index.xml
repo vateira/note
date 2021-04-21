@@ -1,0 +1,132 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on vateira</title><link>http://example.org/posts/</link><description>Recent content in Posts on vateira</description><generator>Hugo -- gohugo.io</generator><language>ja_jp</language><lastBuildDate>Wed, 21 Apr 2021 21:45:50 +0900</lastBuildDate><atom:link href="http://example.org/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>新規プロダクト開発のインフラについて</title><link>http://example.org/posts/002-infra-for-new-products/</link><pubDate>Wed, 21 Apr 2021 21:45:50 +0900</pubDate><guid>http://example.org/posts/002-infra-for-new-products/</guid><description>&lt;p>これはプロダクトがどういったものであるかなどを考慮して決めるものなので、これといった定石は無いとは思っている。&lt;/p>
+&lt;p>ただ「とりあえず何か」という話であれば、自分のように小中規模の組織で web サービスを始めるケースであれば最近は AWS Lightsail が良いのでは無いだろうか。理由は昨年からのコンテナのサポートだ。&lt;/p>
+&lt;p>これから何かプロダクトを作り始めるにあたり、AWS や GCP といった IaaS を利用する際に気になるのはランニングコストだろう。格安とはいえ使い方次第では思った以上に出費が嵩むことも有り得るので、定額で計算できた方が良い。そのあたり Lightsail は見積もり安いし、出費は増えるがマネージド DB やロードバランサも提供されていて、必要最低限のものは一通り揃っている。&lt;/p>
+&lt;p>そして、その Lightsail は去年からコンテナのデプロイができるようになったのだ。
+これで開発環境も実行環境も docker image で共通化が可能だ。例えばサーバサイドとクライアントサイドが別々になっているようなプロダクトであれば、サーバサイドを docker image で共有できるのは間違いなく便利だろう。&lt;/p>
+&lt;p>ECR や dockerhub のプライベートイメージとの連携はサポートされていないのが残念だけれども、GitHub Actions などの CI ツールでコマンドを叩くのもそこまで大変ではない。&lt;/p>
+&lt;p> ここからは個人的な好みになってくるけれども、近頃は deno が面白い。node.js などとは違い、標準で単一の実行バイナリに変換できるので、開発者以外は実行環境を特別に用意する必要がなくて便利。TypeScript での開発も結構生産性が高くて良いと思う。
+今のところ SQL の扱いに関しては、キラーパッケージというか「これだ」というのが出ていないのは少し残念ではあるけれども&amp;hellip;&lt;/p></description></item><item><title>ユーザーストーリーをソフトウェアの設計にそのまま落とし込むアイデア</title><link>http://example.org/posts/001-usecase-oriented-design/</link><pubDate>Tue, 20 Apr 2021 21:56:31 +0900</pubDate><guid>http://example.org/posts/001-usecase-oriented-design/</guid><description>&lt;p>アジャイルな開発を導入する際に、バックログに積むタスクをユーザーストーリーとして表すプラクティスを取り入れることが多い。
+シンプルなルールなので取り組みやすいイメージがあるのだけれども、プロジェクトが進んでいくとロールやユーザーができることの抽象度などを運用していくことが思いの外難しいと感じることが個人的には多いのだ。&lt;/p>
+&lt;p>原因の一つはユーザーストーリーが「タスク内容を分かりやすくまとめたタイトル」という役目に止まっていることなのかもしれない。&lt;/p>
+&lt;p>もし、ユーザークラスをソフトウェアの機能の単位として扱うことができれば、開発メンバーなどが普段からユーザーストーリーの表現そのものを意識する機会も増えて上記の問題は解決できるのかもしれない。また、ソフトウェアの設計自体もバックログに積まれていたタスクと一対一の対応が取れて、保守がしやすくなる可能性もある。&lt;/p>
+&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-dart:users.dart" data-lang="dart:users.dart">&lt;span style="color:#66d9ef">class&lt;/span> &lt;span style="color:#a6e22e">class&lt;/span> User {}
+&lt;span style="color:#66d9ef">class&lt;/span> &lt;span style="color:#a6e22e">Guest&lt;/span> &lt;span style="color:#66d9ef">extends&lt;/span> User {}
+&lt;span style="color:#66d9ef">class&lt;/span> &lt;span style="color:#a6e22e">Member&lt;/span> &lt;span style="color:#66d9ef">extends&lt;/span> User {
+&lt;span style="color:#66d9ef">final&lt;/span> &lt;span style="color:#66d9ef">String&lt;/span> id;
+}
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>このように、プロダクトを利用するユーザーを全てクラスとして定義する。&lt;/p>
+&lt;p>それぞれのユーザーストーリーは、何かのユーザーを表現するクラスのメンバーとして定義するのが良さそうだ。&lt;/p>
+&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-dart:member_see_their_purchase_history.dart" data-lang="dart:member_see_their_purchase_history.dart">&lt;span style="color:#75715e">// member_see_their_purchase_history.dart
+&lt;/span>&lt;span style="color:#75715e">&lt;/span>extension MemberSeeTheirPurchaseHistory on Member {
+List&lt;span style="color:#f92672">&amp;lt;&lt;/span>&lt;span style="color:#66d9ef">dynamic&lt;/span>&lt;span style="color:#f92672">&amp;gt;&lt;/span> seeTheirPurchaseHistory() &lt;span style="color:#66d9ef">async&lt;/span> {
+&lt;span style="color:#66d9ef">return&lt;/span> &lt;span style="color:#66d9ef">await&lt;/span> DB.instance().getPurchaseHistoryOf(&lt;span style="color:#66d9ef">this&lt;/span>.id);
+}
+}
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>うまくユーザーストーリーを設計することができれば、このユーザーストーリーが表すのはユースケースやアプリケーションロジックである。&lt;/p>
+&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-dart:server.dart" data-lang="dart:server.dart">&lt;span style="color:#75715e">// server.dart
+&lt;/span>&lt;span style="color:#75715e">&lt;/span>router.&lt;span style="color:#66d9ef">get&lt;/span>(&lt;span style="color:#e6db74">&amp;#39;/purchase-history&amp;#39;&lt;/span>, (request) &lt;span style="color:#66d9ef">async&lt;/span> {
+&lt;span style="color:#75715e">// リクエストなどからユーザーのロールを取得する
+&lt;/span>&lt;span style="color:#75715e">&lt;/span> &lt;span style="color:#66d9ef">final&lt;/span> member &lt;span style="color:#f92672">=&lt;/span> accountFromHeader(request.header);
+&lt;span style="color:#75715e">// ロールがメンバーであれば、購買履歴を取得する
+&lt;/span>&lt;span style="color:#75715e">&lt;/span> &lt;span style="color:#66d9ef">if&lt;/span>(member &lt;span style="color:#66d9ef">is&lt;/span> Member) {
+&lt;span style="color:#66d9ef">final&lt;/span> history &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#66d9ef">await&lt;/span> member.seeTheirPurchaseHistory();
+&lt;span style="color:#66d9ef">return&lt;/span> jsonEncode(history);
+} &lt;span style="color:#66d9ef">else&lt;/span> {
+&lt;span style="color:#66d9ef">throw&lt;/span> &lt;span style="color:#ae81ff">401&lt;/span>;
+}
+});
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>コード量の関係で、リポジトリが&lt;code>DB&lt;/code>というクラスであったり、api サーバが json を返したりすることが前提になっているが、実際はこの辺りは依存性の注入などによって切り替えられるようにしておくと良いだろう。&lt;/p></description></item><item><title>お仕事について</title><link>http://example.org/posts/jobs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>http://example.org/posts/jobs/</guid><description>&lt;h3 id="フルタイム">フルタイム&lt;/h3>
+&lt;p>現在、直接のフルタイムでのスカウト等は承っていません。&lt;/p>
+&lt;h3 id="パートタイム業務委託">パートタイム/業務委託&lt;/h3>
+&lt;p>小〜中規模なプロダクト開発であれば、プロマネやユーティリティプレーヤーとしてお手伝いできると思います。
+詳しくは&lt;a href="http://example.org/posts/works/">これまでの実績例&lt;/a>
+をご覧ください。&lt;/p>
+&lt;ul>
+&lt;li>プロジェクトマネジメント&lt;/li>
+&lt;li>ソフトウェア開発(web フロントエンド, サーバサイド, モバイルアプリ開発)
+&lt;ul>
+&lt;li>web フロントエンド: Svelte / Vue / JQuery / Elm など&lt;/li>
+&lt;li>モバイルアプリ: Flutter など&lt;/li>
+&lt;li>サーバサイド: TypeScript / php / dart / python など&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>料金の目安としては業務内容の専門性や職務範囲などに応じて 3,000〜15,000 円/時で計算しています。
+プロジェクトや会社の予算感等を 提示していただければ、その範囲で可能な業務内容をこちらから提案させていただくことも可能です。&lt;/p></description></item><item><title>これまでの仕事の例</title><link>http://example.org/posts/works/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>http://example.org/posts/works/</guid><description>&lt;p>フルタイム以外の場合の事例です。&lt;/p>
+&lt;h3 id="プロジェクトマネジメント">プロジェクトマネジメント&lt;/h3>
+&lt;ol>
+&lt;li>スタートアップのプロダクト開発のプロジェクトマネジメント
+&lt;ul>
+&lt;li>エンジニア数名及び、オフショアで開発を外注しているプロジェクトのマネジメントを担当。また UI デザインと開発の一部を担当&lt;/li>
+&lt;li>期間: 10 ヶ月(週 8〜32 時間)&lt;/li>
+&lt;li>使用技術
+&lt;ul>
+&lt;li>インフラ, サーバサイド: サーバレスアーキテクチャ(AWS)&lt;/li>
+&lt;li>モバイルアプリ: Swift/Kotlin&lt;/li>
+&lt;li>UI デザイン: Adobe Illustrator, Adobe XD&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="ソフトウェアエンジニア">ソフトウェアエンジニア&lt;/h3>
+&lt;ol>
+&lt;li>東証一部上場企業のシステム内製化
+&lt;ul>
+&lt;li>外注で製作していたサービスを内製化するにあたり、システムの移行や、エンジニアが少ない社内環境で運用するためのツールの開発などを相談を受けながら作成した。ソフトウェア周辺は個人で担当、インフラについては社内インフラエンジニアの相談に回答する形で対応。&lt;/li>
+&lt;li>期間: 10 ヶ月(週 16 時間前後)&lt;/li>
+&lt;li>使用技術
+&lt;ul>
+&lt;li>インフラ: AWS&lt;/li>
+&lt;li>サーバサイド: CakePHP&lt;/li>
+&lt;li>フロントエンド: Vue&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>ある疾患の患者を介護する家族をサポートする web サービスのプロトタイプ開発
+&lt;ul>
+&lt;li>国立大学法人及び某企業の研究所の共同研究におけるシステムのプロトタイプ開発を受託&lt;/li>
+&lt;li>研究の担当者や学生と相談しながら、サービスのデザインや実装(サーバサイド/web フロントエンド)を開発&lt;/li>
+&lt;li>期間: 6 ヶ月(実験等が行われる都度フィードバックを受けて改修するため連続ではない)&lt;/li>
+&lt;li>使用技術
+&lt;ul>
+&lt;li>インフラ: 依頼者の管理するサーバー(Ubuntu)a&lt;/li>
+&lt;li>サーバサイド: php&lt;/li>
+&lt;li>フロントエンド: php/JavaScript&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>大学学校法人の認知心理学の実験用システムの開発
+&lt;ul>
+&lt;li>特定のタスクに対する反応速度などを計測するためのアプリを開発&lt;/li>
+&lt;li>ミニゲーム形式で操作などに対する速度を計測するデスクトップアプリ&lt;/li>
+&lt;li>研究の目的や調べたい事項などを聞きながら仕様などを提案した&lt;/li>
+&lt;li>研究の責任者や学生(非情報系)が VB.net であればメンテナンスできるということで VB.net で開発&lt;/li>
+&lt;li>実験用の操作デバイスを Mbed で製作&lt;/li>
+&lt;li>期間: 6 ヶ月(実験等が行われる都度フィードバックを受けて改修するため連続ではない)&lt;/li>
+&lt;li>使用技術
+&lt;ul>
+&lt;li>デスクトップアプリ: VB.net&lt;/li>
+&lt;li>操作用デバイス: Mbed&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="ui-デザイン">UI デザイン&lt;/h3>
+&lt;ol>
+&lt;li>産業機器の操作画面の画面デザイン
+&lt;ul>
+&lt;li>工場等で稼働する産業機器を操作するためのアプリケーションの画面デザインを担当&lt;/li>
+&lt;li>製品が取得する ISO などの規格や、産業機器の誤操作を防ぐための認知心理学的な知見を考慮してデザインを進めた&lt;/li>
+&lt;li>12 ヶ月(週 8 時間前後)&lt;/li>
+&lt;li>使用技術
+&lt;ul>
+&lt;li>デザイン: Adobe Illustrator&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol></description></item></channel></rss>
