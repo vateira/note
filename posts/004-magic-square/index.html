@@ -1,0 +1,74 @@
+<!doctype html><html lang=en><meta charset=utf-8><meta name=generator content="Hugo 0.82.1"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name=color-scheme content="light dark"><meta name=supported-color-schemes content="light dark"><title>SMTソルバ(z3)で魔方陣を解く&nbsp;&ndash;&nbsp;vateira</title><link rel=stylesheet href=/css/core.min.f9b46d8798868738a17cdf2202a9498a1403d72e409a3588b9aa2c45c2b8406be2e1a9574e524cad37c935bd434f6c2a.css integrity=sha384-+bRth5iGhzihfN8iAqlJihQD1y5AmjWIuaosRcK4QGvi4alXTlJMrTfJNb1DT2wq><meta name=twitter:card content="summary"><meta name=twitter:title content="SMTソルバ(z3)で魔方陣を解く"><meta name=robots content="noindex,nofollow"><body><section id=header><div class="header wrap"><span class="header left-side"><a class="site home" href=/><span class="site name">vateira</span></a></span>
+<span class="header right-side"><div class="nav wrap"><nav class=nav><a class="nav item" href=/posts/works>これまでの仕事の例</a><a class="nav item" href=/posts/jobs>お仕事について</a></nav></div></span></div></section><section id=content><div class=article-container><section class="article header"><h1 class="article title">SMTソルバ(z3)で魔方陣を解く</h1><p class="article date">2021-04-23</p></section><article class="article markdown-body"><p>minisat で魔方陣を解こうかと思ったけれども、CNF で和の制約を書くのが大変そうだったので SMT ソルバを使って解く。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>% pip install z3-solver
+</code></pre></div><p>あとはスクリプトを書くだけ。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python:magic-square.py data-lang=python:magic-square.py><span style=color:#f92672>from</span> z3 <span style=color:#f92672>import</span> <span style=color:#f92672>*</span>
+
+solver <span style=color:#f92672>=</span> Solver()
+
+<span style=color:#75715e># 5 * 5 の魔方陣を扱う</span>
+size <span style=color:#f92672>=</span> <span style=color:#ae81ff>5</span>
+
+<span style=color:#75715e># 各行,列,対角線の和</span>
+summary <span style=color:#f92672>=</span> ((size <span style=color:#f92672>**</span> <span style=color:#ae81ff>2</span> <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>) <span style=color:#f92672>*</span> size) <span style=color:#f92672>/</span> <span style=color:#ae81ff>2</span>
+
+<span style=color:#75715e># 0〜n^2の変数を用意する</span>
+cells <span style=color:#f92672>=</span> [Int(<span style=color:#e6db74>&#34;c[</span><span style=color:#e6db74>%d</span><span style=color:#e6db74>]&#34;</span> <span style=color:#f92672>%</span> x) <span style=color:#66d9ef>for</span> x <span style=color:#f92672>in</span> range(size <span style=color:#f92672>**</span> <span style=color:#ae81ff>2</span>)]
+
+<span style=color:#75715e># 各セルは1〜n^2の数字が入る</span>
+<span style=color:#66d9ef>for</span> x <span style=color:#f92672>in</span> range(size <span style=color:#f92672>**</span> <span style=color:#ae81ff>2</span>):
+    solver<span style=color:#f92672>.</span>add(<span style=color:#ae81ff>1</span> <span style=color:#f92672>&lt;=</span> cells[x], cells[x] <span style=color:#f92672>&lt;=</span> size <span style=color:#f92672>**</span> <span style=color:#ae81ff>2</span>)
+
+<span style=color:#75715e># それぞれの数字は一度のみ現れる</span>
+solver<span style=color:#f92672>.</span>add(Distinct(cells))
+
+<span style=color:#75715e># 各行の和はsummaryになる</span>
+<span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> range(size):
+    rows <span style=color:#f92672>=</span> [cells[i <span style=color:#f92672>*</span> size <span style=color:#f92672>+</span> x] <span style=color:#66d9ef>for</span> x <span style=color:#f92672>in</span> range(size)]
+    solver<span style=color:#f92672>.</span>add(sum(rows) <span style=color:#f92672>==</span> summary)
+
+<span style=color:#75715e># 各列の和はsummaryになる</span>
+<span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> range(size):
+    cols <span style=color:#f92672>=</span> [cells[x <span style=color:#f92672>*</span> size <span style=color:#f92672>+</span> i] <span style=color:#66d9ef>for</span> x <span style=color:#f92672>in</span> range(size)]
+    solver<span style=color:#f92672>.</span>add(sum(cols) <span style=color:#f92672>==</span> summary)
+
+<span style=color:#75715e># 対角線1の和はsummaryになる</span>
+dia1 <span style=color:#f92672>=</span> [cells[x <span style=color:#f92672>*</span> size <span style=color:#f92672>+</span> x] <span style=color:#66d9ef>for</span> x <span style=color:#f92672>in</span> range(size)]
+solver<span style=color:#f92672>.</span>add(sum(dia1) <span style=color:#f92672>==</span> summary)
+
+<span style=color:#75715e># 対角線2の和はsummaryになる</span>
+dia2 <span style=color:#f92672>=</span> [cells[(x <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>) <span style=color:#f92672>*</span> (size <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>)] <span style=color:#66d9ef>for</span> x <span style=color:#f92672>in</span> range(size)]
+solver<span style=color:#f92672>.</span>add(sum(dia2) <span style=color:#f92672>==</span> summary)
+
+<span style=color:#75715e># 予めセルに何か指定しておく</span>
+solver<span style=color:#f92672>.</span>add(cells[<span style=color:#ae81ff>0</span>] <span style=color:#f92672>==</span> <span style=color:#ae81ff>10</span>)
+solver<span style=color:#f92672>.</span>add(cells[<span style=color:#ae81ff>12</span>] <span style=color:#f92672>==</span> <span style=color:#ae81ff>13</span>)
+
+
+<span style=color:#75715e># 解を求める</span>
+solver<span style=color:#f92672>.</span>check()
+
+<span style=color:#75715e># 表示</span>
+model <span style=color:#f92672>=</span> solver<span style=color:#f92672>.</span>model()
+<span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> range(size):
+    <span style=color:#66d9ef>for</span> j <span style=color:#f92672>in</span> range(size):
+        cell <span style=color:#f92672>=</span> cells[i <span style=color:#f92672>*</span> size <span style=color:#f92672>+</span> j]
+        <span style=color:#66d9ef>print</span>(<span style=color:#e6db74>&#34;</span><span style=color:#e6db74>%d</span><span style=color:#ae81ff>\t</span><span style=color:#e6db74>&#34;</span> <span style=color:#f92672>%</span> model[cell]<span style=color:#f92672>.</span>as_long(), end<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;&#34;</span>)
+    <span style=color:#66d9ef>print</span>(<span style=color:#e6db74>&#34;&#34;</span>)
+</code></pre></div><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>% python3 ./magic_square.py
+<span style=color:#ae81ff>10</span>      <span style=color:#ae81ff>22</span>      <span style=color:#ae81ff>17</span>      <span style=color:#ae81ff>1</span>       <span style=color:#ae81ff>15</span>
+<span style=color:#ae81ff>6</span>       <span style=color:#ae81ff>16</span>      <span style=color:#ae81ff>7</span>       <span style=color:#ae81ff>11</span>      <span style=color:#ae81ff>25</span>
+<span style=color:#ae81ff>24</span>      <span style=color:#ae81ff>2</span>       <span style=color:#ae81ff>13</span>      <span style=color:#ae81ff>18</span>      <span style=color:#ae81ff>8</span>
+<span style=color:#ae81ff>4</span>       <span style=color:#ae81ff>5</span>       <span style=color:#ae81ff>19</span>      <span style=color:#ae81ff>23</span>      <span style=color:#ae81ff>14</span>
+<span style=color:#ae81ff>21</span>      <span style=color:#ae81ff>20</span>      <span style=color:#ae81ff>9</span>       <span style=color:#ae81ff>12</span>      <span style=color:#ae81ff>3</span>
+</code></pre></div><p>今回は 5 * 5 の魔方陣用に作成したけれども、size を変更して具体的な値の制約を削除または変更すればそれ以外の大きさの魔方陣にも対応できる。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-diff data-lang=diff><span style=color:#f92672>- # 5 * 5 の魔方陣を扱う
+</span><span style=color:#f92672></span><span style=color:#a6e22e>+ # 3 * 3 の魔方陣を扱う
+</span><span style=color:#a6e22e></span><span style=color:#f92672>- size = 5
+</span><span style=color:#f92672></span><span style=color:#a6e22e>+ size = 3
+</span><span style=color:#a6e22e></span>
+<span style=color:#f92672>- # 予めセルに何か指定しておく
+</span><span style=color:#f92672>- solver.add(cells[0] == 10)
+</span><span style=color:#f92672>- solver.add(cells[12] == 13)
+</span></code></pre></div><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>% python3 ./magic_square.py
+<span style=color:#ae81ff>2</span>       <span style=color:#ae81ff>7</span>       <span style=color:#ae81ff>6</span>
+<span style=color:#ae81ff>9</span>       <span style=color:#ae81ff>5</span>       <span style=color:#ae81ff>1</span>
+<span style=color:#ae81ff>4</span>       <span style=color:#ae81ff>3</span>       <span style=color:#ae81ff>8</span>
+</code></pre></div><p>SAT ソルバで CNF 形式で行や列ごとの和の制約を表現するのはめちゃくちゃ大変そうだったけれども、SMT ソルバでこういうふうにできるのであれば結構簡単だ。特に python 向けの z3 は通常の算術演算子が使えて、<code>sum</code>なども利用できるので直感的に記述できるのが便利。</p></article><section class="article labels"><a class=tag href=/tags/python/>python</a><a class=tag href=/tags/formal-methods/>formal methods</a></section><section class="article author"><p class=name>vateira</p><div class=bio>webサービス、モバイルアプリ中心のプロマネ兼ソフトウェアエンジニア。</div><div class=details></div></section></div><div class="article bottom"><section class="article navigation"><p><a class=link href=/posts/003-serverside-dart/><span class="iconfont icon-article"></span>サーバサイドDartのアイデア</a></p></section></div></section><section id=footer><div class=footer-wrap><p class=copyright>vateira</p><p class=powerby><span>Powered&nbsp;by&nbsp;</span><a href=https://gohugo.io target=_blank rel="noopener noreferrer">Hugo</a><span>&nbsp;&&nbsp;</span><a href=https://themes.gohugo.io/hugo-notepadium/ target=_blank rel="noopener noreferrer">Notepadium</a></p></div></section><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-195243970-1','auto'),ga('send','pageview'))</script><script async src=https://www.google-analytics.com/analytics.js></script></body></html>
