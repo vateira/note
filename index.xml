@@ -1,4 +1,61 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>vateira</title><link>http://example.org/</link><description>Recent content on vateira</description><generator>Hugo -- gohugo.io</generator><language>ja_jp</language><lastBuildDate>Wed, 21 Apr 2021 21:45:50 +0900</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml"/><item><title>新規プロダクト開発のインフラについて</title><link>http://example.org/posts/002-infra-for-new-products/</link><pubDate>Wed, 21 Apr 2021 21:45:50 +0900</pubDate><guid>http://example.org/posts/002-infra-for-new-products/</guid><description>&lt;p>これはプロダクトがどういったものであるかなどを考慮して決めるものなので、これといった定石は無いとは思っている。&lt;/p>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>vateira</title><link>http://example.org/</link><description>Recent content on vateira</description><generator>Hugo -- gohugo.io</generator><language>ja_jp</language><lastBuildDate>Thu, 22 Apr 2021 18:18:03 +0900</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml"/><item><title>サーバサイドDartのアイデア</title><link>http://example.org/posts/003-serverside-dart/</link><pubDate>Thu, 22 Apr 2021 18:18:03 +0900</pubDate><guid>http://example.org/posts/003-serverside-dart/</guid><description>&lt;p>モバイルアプリ開発において、開発リソースが潤沢でないのであれば Flutter の導入は非常に強力な選択肢となる。じっさい、ここ三年ほどスタートアップにてメインのプロダクトを Flutter で開発していて個人的にはとても気に入っている(Dart への不満はゼロでは無いけれども)。&lt;/p>
+&lt;p>そして、Flutter において個人的に状態管理の肝となっているのは freezed パッケージの存在だ。
+Kotlin の data class のようなものが言語として提供されていないが、昨今の GUI アプリケーションで immutable なデータ構造無しに状態管理をするのは非常に辛いものがある。当初はこういったもの無しでもなんとかやれていたが、アプリケーションの仕様が複雑になるにつれて、こいつの存在は必須になってきた。&lt;/p>
+&lt;p>この freezed 自体は Dart のパッケージとして提供されているので、Flutter 以外でも使うことができる。もしモバイルアプリがサーバと通信するのであれば、サーバサイドも Dart で実装して freezed で作成したエンティティなどを共有すれば、非常に効率よくコードを共有できるのでは無いだろうか。また、抽象化されたアプリケーションロジックを共有することができれば、テストなども効率化できそうな気がする。&lt;/p>
+&lt;p>ということで、Dart の web フレームワークを調べたところ、&lt;a href="https://github.com/stablekernel/aqueduct"target="_blank" rel="noopener noreferrer">aqueduct&lt;/a>
+が一番メジャーっぽかったのだけれども、これが丁度先月あたりにプロジェクトが凍結されてしまっていた。他の web フレームワークはメンテナンスやユーザー数からしてもプロダクトに採用するには少し心許ない。&lt;/p>
+&lt;p>などと漁っていたが、どうやら Dart 公式のミドルウェアフレームワークである&lt;a href="https://github.com/dart-lang/shelf"target="_blank" rel="noopener noreferrer">shelf&lt;/a>
+が非常に使いやすそうである。&lt;a href="https://pub.dev/packages/shelf_router"target="_blank" rel="noopener noreferrer">shelf_router&lt;/a>
+と組み合わせれば、簡単にアプリケーションサーバーを実装できる。&lt;/p>
+&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-dart" data-lang="dart">&lt;span style="color:#66d9ef">import&lt;/span> &lt;span style="color:#e6db74">&amp;#39;package:shelf_router/shelf_router.dart&amp;#39;&lt;/span>;
+&lt;span style="color:#66d9ef">import&lt;/span> &lt;span style="color:#e6db74">&amp;#39;package:shelf/shelf.dart&amp;#39;&lt;/span>;
+&lt;span style="color:#66d9ef">import&lt;/span> &lt;span style="color:#e6db74">&amp;#39;package:shelf/shelf_io.dart&amp;#39;&lt;/span> &lt;span style="color:#66d9ef">as&lt;/span> io;
+&lt;span style="color:#66d9ef">var&lt;/span> app &lt;span style="color:#f92672">=&lt;/span> Router();
+app.&lt;span style="color:#66d9ef">get&lt;/span>(&lt;span style="color:#e6db74">&amp;#39;/hello&amp;#39;&lt;/span>, (Request request) {
+&lt;span style="color:#66d9ef">return&lt;/span> Response.ok(&lt;span style="color:#e6db74">&amp;#39;hello-world&amp;#39;&lt;/span>);
+});
+app.&lt;span style="color:#66d9ef">get&lt;/span>(&lt;span style="color:#e6db74">&amp;#39;/user/&amp;lt;user&amp;gt;&amp;#39;&lt;/span>, (Request request, &lt;span style="color:#66d9ef">String&lt;/span> user) {
+&lt;span style="color:#66d9ef">return&lt;/span> Response.ok(&lt;span style="color:#e6db74">&amp;#39;hello &lt;/span>&lt;span style="color:#e6db74">$&lt;/span>user&lt;span style="color:#e6db74">&amp;#39;&lt;/span>);
+});
+&lt;span style="color:#66d9ef">var&lt;/span> server &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#66d9ef">await&lt;/span> io.serve(app.handler, &lt;span style="color:#e6db74">&amp;#39;localhost&amp;#39;&lt;/span>, &lt;span style="color:#ae81ff">8080&lt;/span>);
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>試してみたところ、deno の oak や php の slim のような感じだ。モバイルアプリで RESTful api をリクエストするような用途であれば十分だろう。
+それとこの Shelf、ミドルウェアを自作するのも容易なので、&lt;/p>
+&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-dart" data-lang="dart">&lt;span style="color:#66d9ef">import&lt;/span> &lt;span style="color:#e6db74">&amp;#39;package:shelf/shelf.dart&amp;#39;&lt;/span>;
+Middleware auth() &lt;span style="color:#f92672">=&amp;gt;&lt;/span> (innerHandler) {
+&lt;span style="color:#66d9ef">return&lt;/span> (request) &lt;span style="color:#66d9ef">async&lt;/span> {
+&lt;span style="color:#66d9ef">if&lt;/span>(&lt;span style="color:#960050;background-color:#1e0010">認証失敗&lt;/span>) {
+&lt;span style="color:#66d9ef">return&lt;/span> Response(&lt;span style="color:#ae81ff">401&lt;/span>, body: &lt;span style="color:#e6db74">&amp;#39;FORBIDDEN&amp;#39;&lt;/span>);
+}
+&lt;span style="color:#66d9ef">final&lt;/span> response &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#66d9ef">await&lt;/span> innerHandler(request);
+&lt;span style="color:#66d9ef">return&lt;/span> response;
+};
+};
+&lt;span style="color:#66d9ef">final&lt;/span> handler &lt;span style="color:#f92672">=&lt;/span>
+&lt;span style="color:#66d9ef">const&lt;/span> Pipeline().addMiddleware(auth()).addHandler(router());
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>のように色々追加できる。
+あとはこんな感じでプロダクトを分割すれば良さそう。&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>package&lt;/th>
+&lt;th>概要&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>core&lt;/td>
+&lt;td>entity, application logic やリポジトリなどのインタフェース&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>client&lt;/td>
+&lt;td>Flutter アプリ。アプリケーションロジックは core を使う。またリポジトリに server を指定する&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>server&lt;/td>
+&lt;td>アプリケーションサーバー。アプリケーションロジックは core を使う。リポジトリは DB などを使う&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item><item><title>新規プロダクト開発のインフラについて</title><link>http://example.org/posts/002-infra-for-new-products/</link><pubDate>Wed, 21 Apr 2021 21:45:50 +0900</pubDate><guid>http://example.org/posts/002-infra-for-new-products/</guid><description>&lt;p>これはプロダクトがどういったものであるかなどを考慮して決めるものなので、これといった定石は無いとは思っている。&lt;/p>
 &lt;p>ただ「とりあえず何か」という話であれば、自分のように小中規模の組織で web サービスを始めるケースであれば最近は AWS Lightsail が良いのでは無いだろうか。理由は昨年からのコンテナのサポートだ。&lt;/p>
 &lt;p>これから何かプロダクトを作り始めるにあたり、AWS や GCP といった IaaS を利用する際に気になるのはランニングコストだろう。格安とはいえ使い方次第では思った以上に出費が嵩むことも有り得るので、定額で計算できた方が良い。そのあたり Lightsail は見積もり安いし、出費は増えるがマネージド DB やロードバランサも提供されていて、必要最低限のものは一通り揃っている。&lt;/p>
 &lt;p>そして、その Lightsail は去年からコンテナのデプロイができるようになったのだ。

@@ -1,0 +1,37 @@
+<!doctype html><html lang=en><meta charset=utf-8><meta name=generator content="Hugo 0.82.1"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name=color-scheme content="light dark"><meta name=supported-color-schemes content="light dark"><title>サーバサイドDartのアイデア&nbsp;&ndash;&nbsp;vateira</title><link rel=stylesheet href=/css/core.min.f9b46d8798868738a17cdf2202a9498a1403d72e409a3588b9aa2c45c2b8406be2e1a9574e524cad37c935bd434f6c2a.css integrity=sha384-+bRth5iGhzihfN8iAqlJihQD1y5AmjWIuaosRcK4QGvi4alXTlJMrTfJNb1DT2wq><meta name=twitter:card content="summary"><meta name=twitter:title content="サーバサイドDartのアイデア"><meta name=robots content="noindex,nofollow"><body><section id=header><div class="header wrap"><span class="header left-side"><a class="site home" href=/><span class="site name">vateira</span></a></span>
+<span class="header right-side"><div class="nav wrap"><nav class=nav><a class="nav item" href=/posts/works>これまでの仕事の例</a><a class="nav item" href=/posts/jobs>お仕事について</a></nav></div></span></div></section><section id=content><div class=article-container><section class="article header"><h1 class="article title">サーバサイドDartのアイデア</h1><p class="article date">2021-04-22</p></section><article class="article markdown-body"><p>モバイルアプリ開発において、開発リソースが潤沢でないのであれば Flutter の導入は非常に強力な選択肢となる。じっさい、ここ三年ほどスタートアップにてメインのプロダクトを Flutter で開発していて個人的にはとても気に入っている(Dart への不満はゼロでは無いけれども)。</p><p>そして、Flutter において個人的に状態管理の肝となっているのは freezed パッケージの存在だ。
+Kotlin の data class のようなものが言語として提供されていないが、昨今の GUI アプリケーションで immutable なデータ構造無しに状態管理をするのは非常に辛いものがある。当初はこういったもの無しでもなんとかやれていたが、アプリケーションの仕様が複雑になるにつれて、こいつの存在は必須になってきた。</p><p>この freezed 自体は Dart のパッケージとして提供されているので、Flutter 以外でも使うことができる。もしモバイルアプリがサーバと通信するのであれば、サーバサイドも Dart で実装して freezed で作成したエンティティなどを共有すれば、非常に効率よくコードを共有できるのでは無いだろうか。また、抽象化されたアプリケーションロジックを共有することができれば、テストなども効率化できそうな気がする。</p><p>ということで、Dart の web フレームワークを調べたところ、<a href=https://github.com/stablekernel/aqueduct target=_blank rel="noopener noreferrer">aqueduct</a>
+が一番メジャーっぽかったのだけれども、これが丁度先月あたりにプロジェクトが凍結されてしまっていた。他の web フレームワークはメンテナンスやユーザー数からしてもプロダクトに採用するには少し心許ない。</p><p>などと漁っていたが、どうやら Dart 公式のミドルウェアフレームワークである<a href=https://github.com/dart-lang/shelf target=_blank rel="noopener noreferrer">shelf</a>
+が非常に使いやすそうである。<a href=https://pub.dev/packages/shelf_router target=_blank rel="noopener noreferrer">shelf_router</a>
+と組み合わせれば、簡単にアプリケーションサーバーを実装できる。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-dart data-lang=dart><span style=color:#66d9ef>import</span> <span style=color:#e6db74>&#39;package:shelf_router/shelf_router.dart&#39;</span>;
+<span style=color:#66d9ef>import</span> <span style=color:#e6db74>&#39;package:shelf/shelf.dart&#39;</span>;
+<span style=color:#66d9ef>import</span> <span style=color:#e6db74>&#39;package:shelf/shelf_io.dart&#39;</span> <span style=color:#66d9ef>as</span> io;
+
+<span style=color:#66d9ef>var</span> app <span style=color:#f92672>=</span> Router();
+
+app.<span style=color:#66d9ef>get</span>(<span style=color:#e6db74>&#39;/hello&#39;</span>, (Request request) {
+  <span style=color:#66d9ef>return</span> Response.ok(<span style=color:#e6db74>&#39;hello-world&#39;</span>);
+});
+
+app.<span style=color:#66d9ef>get</span>(<span style=color:#e6db74>&#39;/user/&lt;user&gt;&#39;</span>, (Request request, <span style=color:#66d9ef>String</span> user) {
+  <span style=color:#66d9ef>return</span> Response.ok(<span style=color:#e6db74>&#39;hello </span><span style=color:#e6db74>$</span>user<span style=color:#e6db74>&#39;</span>);
+});
+
+<span style=color:#66d9ef>var</span> server <span style=color:#f92672>=</span> <span style=color:#66d9ef>await</span> io.serve(app.handler, <span style=color:#e6db74>&#39;localhost&#39;</span>, <span style=color:#ae81ff>8080</span>);
+</code></pre></div><p>試してみたところ、deno の oak や php の slim のような感じだ。モバイルアプリで RESTful api をリクエストするような用途であれば十分だろう。
+それとこの Shelf、ミドルウェアを自作するのも容易なので、</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-dart data-lang=dart><span style=color:#66d9ef>import</span> <span style=color:#e6db74>&#39;package:shelf/shelf.dart&#39;</span>;
+
+Middleware auth() <span style=color:#f92672>=&gt;</span> (innerHandler) {
+      <span style=color:#66d9ef>return</span> (request) <span style=color:#66d9ef>async</span> {
+        <span style=color:#66d9ef>if</span>(<span style=color:#960050;background-color:#1e0010>認証失敗</span>) {
+            <span style=color:#66d9ef>return</span> Response(<span style=color:#ae81ff>401</span>, body: <span style=color:#e6db74>&#39;FORBIDDEN&#39;</span>);
+        }
+        <span style=color:#66d9ef>final</span> response <span style=color:#f92672>=</span> <span style=color:#66d9ef>await</span> innerHandler(request);
+        <span style=color:#66d9ef>return</span> response;
+      };
+    };
+
+<span style=color:#66d9ef>final</span> handler <span style=color:#f92672>=</span>
+      <span style=color:#66d9ef>const</span> Pipeline().addMiddleware(auth()).addHandler(router());
+</code></pre></div><p>のように色々追加できる。
+あとはこんな感じでプロダクトを分割すれば良さそう。</p><table><thead><tr><th>package</th><th>概要</th></tr></thead><tbody><tr><td>core</td><td>entity, application logic やリポジトリなどのインタフェース</td></tr><tr><td>client</td><td>Flutter アプリ。アプリケーションロジックは core を使う。またリポジトリに server を指定する</td></tr><tr><td>server</td><td>アプリケーションサーバー。アプリケーションロジックは core を使う。リポジトリは DB などを使う</td></tr></tbody></table></article><section class="article labels"><a class=tag href=/tags/%E8%A8%AD%E8%A8%88/>設計</a><a class=tag href=/tags/dart/>Dart</a><a class=tag href=/tags/%E3%82%B5%E3%83%BC%E3%83%90%E3%82%B5%E3%82%A4%E3%83%89/>サーバサイド</a></section><section class="article author"><p class=name>vateira</p><div class=bio>webサービス、モバイルアプリ中心のプロマネ兼ソフトウェアエンジニア。</div><div class=details></div></section></div><div class="article bottom"><section class="article navigation"><p><a class=link href=/posts/002-infra-for-new-products/><span class="iconfont icon-article"></span>新規プロダクト開発のインフラについて</a></p></section></div></section><section id=footer><div class=footer-wrap><p class=copyright>vateira</p><p class=powerby><span>Powered&nbsp;by&nbsp;</span><a href=https://gohugo.io target=_blank rel="noopener noreferrer">Hugo</a><span>&nbsp;&&nbsp;</span><a href=https://themes.gohugo.io/hugo-notepadium/ target=_blank rel="noopener noreferrer">Notepadium</a></p></div></section><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-195243970-1','auto'),ga('send','pageview'))</script><script async src=https://www.google-analytics.com/analytics.js></script></body></html>
