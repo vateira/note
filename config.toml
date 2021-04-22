@@ -2,13 +2,15 @@ baseURL = "http://example.org/"
 languageCode = "ja_jp"
 title = "vateira"
 theme = "hugo-notepadium"
+publishDir = "docs"
+canonifyurls = true
 
 
 
 [params]
     style = "dark"
     robots = "noindex,nofollow"
-    
+
 [params.profile]
     enable = true
     name = "vateira"
