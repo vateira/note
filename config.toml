@@ -2,7 +2,7 @@ baseURL = "http://example.org/"
 languageCode = "ja_jp"
 title = "vateira"
 theme = "hugo-notepadium"
-
+googleAnalytics = "UA-195243970-1"
 
 
 [params]
