@@ -13,7 +13,7 @@ Pipeable &lt;span style="color:#66d9ef">operator&lt;/span> &lt;span style="color
 &lt;span style="color:#66d9ef">void&lt;/span> main() {
 Pipeable(&lt;span style="color:#ae81ff">10&lt;/span>)
 &lt;span style="color:#f92672">&amp;gt;&amp;gt;&lt;/span> ((x) &lt;span style="color:#f92672">=&amp;gt;&lt;/span> x &lt;span style="color:#f92672">*&lt;/span> x)
-&lt;span style="color:#f92672">&amp;gt;&amp;gt;&lt;/span> ((x) &lt;span style="color:#f92672">=&amp;gt;&lt;/span> &lt;span style="color:#e6db74">&amp;#39;squad value is &lt;/span>&lt;span style="color:#e6db74">${&lt;/span>x&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#39;&lt;/span>)
+&lt;span style="color:#f92672">&amp;gt;&amp;gt;&lt;/span> ((x) &lt;span style="color:#f92672">=&amp;gt;&lt;/span> &lt;span style="color:#e6db74">&amp;#39;squared value is &lt;/span>&lt;span style="color:#e6db74">${&lt;/span>x&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#39;&lt;/span>)
 &lt;span style="color:#f92672">&amp;gt;&amp;gt;&lt;/span> ((x) &lt;span style="color:#f92672">=&amp;gt;&lt;/span> print(x))
 ;
 }
