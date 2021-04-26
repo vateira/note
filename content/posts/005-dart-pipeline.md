@@ -27,7 +27,7 @@ class Pipeable<T> {
 void main() {
   Pipeable(10)
     >> ((x) => x * x)
-    >> ((x) => 'squad value is ${x}')
+    >> ((x) => 'squared value is ${x}')
     >> ((x) => print(x))
     ;
 }
