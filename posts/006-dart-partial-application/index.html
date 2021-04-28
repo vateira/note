@@ -1,0 +1,38 @@
+<!doctype html><html lang=en><meta charset=utf-8><meta name=generator content="Hugo 0.82.1"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name=color-scheme content="light dark"><meta name=supported-color-schemes content="light dark"><title>Dartでの関数の部分適用&nbsp;&ndash;&nbsp;vateira</title><link rel=stylesheet href=/css/core.min.f9b46d8798868738a17cdf2202a9498a1403d72e409a3588b9aa2c45c2b8406be2e1a9574e524cad37c935bd434f6c2a.css integrity=sha384-+bRth5iGhzihfN8iAqlJihQD1y5AmjWIuaosRcK4QGvi4alXTlJMrTfJNb1DT2wq><meta name=twitter:card content="summary"><meta name=twitter:title content="Dartでの関数の部分適用"><meta name=robots content="noindex,nofollow"><body><section id=header><div class="header wrap"><span class="header left-side"><a class="site home" href=/><span class="site name">vateira</span></a></span>
+<span class="header right-side"><div class="nav wrap"><nav class=nav><a class="nav item" href=/posts/works>これまでの仕事の例</a><a class="nav item" href=/posts/jobs>お仕事について</a></nav></div></span></div></section><section id=content><div class=article-container><section class="article header"><h1 class="article title">Dartでの関数の部分適用</h1><p class="article date">2021-04-28</p></section><article class="article markdown-body"><p>Dart は言語として部分適用をサポートしていない。
+前回パイプライン演算子的なものを作ったので、それと組み合わせるために部分適用っぽいことができる仕組みを考えてみる。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-dart data-lang=dart><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Partible</span><span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span> {
+  <span style=color:#66d9ef>final</span> <span style=color:#66d9ef>int</span> arity;
+  T<span style=color:#f92672>?</span> _value;
+  <span style=color:#66d9ef>final</span> Function proc;
+  Partible(<span style=color:#66d9ef>this</span>.arity, <span style=color:#66d9ef>this</span>.proc);
+
+  Partible<span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span> call(List<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>dynamic</span><span style=color:#f92672>&gt;</span> args) {
+    <span style=color:#66d9ef>if</span>(args.length <span style=color:#f92672>==</span> arity) {
+      _value <span style=color:#f92672>=</span> Function.apply(proc, args);
+      <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>this</span>;
+    } <span style=color:#66d9ef>else</span> {
+      <span style=color:#66d9ef>switch</span>(arity <span style=color:#f92672>-</span> args.length) {
+        <span style=color:#66d9ef>case</span> <span style=color:#ae81ff>1</span><span style=color:#f92672>:</span>
+          <span style=color:#66d9ef>return</span> Partible(<span style=color:#ae81ff>1</span>, (x) <span style=color:#f92672>=&gt;</span> Function.apply(proc, [...args, x]));
+        <span style=color:#66d9ef>case</span> <span style=color:#ae81ff>2</span><span style=color:#f92672>:</span>
+          <span style=color:#66d9ef>return</span> Partible(<span style=color:#ae81ff>2</span>, (x, y) <span style=color:#f92672>=&gt;</span> Function.apply(proc, [...args, x, y]));
+        <span style=color:#66d9ef>case</span> <span style=color:#ae81ff>3</span><span style=color:#f92672>:</span>
+          <span style=color:#66d9ef>return</span> Partible(<span style=color:#ae81ff>3</span>, (x, y, z) <span style=color:#f92672>=&gt;</span> Function.apply(proc, [...args, x, y, z]));
+        <span style=color:#66d9ef>default</span><span style=color:#f92672>:</span>
+          <span style=color:#66d9ef>throw</span> <span style=color:#e6db74>&#39;invalid args&#39;</span>;
+      }
+    }
+  }
+
+  T<span style=color:#f92672>?</span> <span style=color:#66d9ef>get</span> value <span style=color:#f92672>=&gt;</span> _value;
+
+}
+
+<span style=color:#66d9ef>void</span> main() {
+  <span style=color:#66d9ef>final</span> times <span style=color:#f92672>=</span> (x, y, z) <span style=color:#f92672>=&gt;</span> x <span style=color:#f92672>*</span> y <span style=color:#f92672>*</span> z;
+  <span style=color:#66d9ef>final</span> p1 <span style=color:#f92672>=</span> Partible(<span style=color:#ae81ff>3</span>, times);
+  <span style=color:#66d9ef>final</span> p2 <span style=color:#f92672>=</span> p1([<span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>3</span>]);
+  print(p2([<span style=color:#ae81ff>4</span>]).value);
+}
+</code></pre></div><p>勢いでやってみたので、もっと綺麗にはできると思う。
+このやり方の場合、任意の関数のアリティが取得できたり、可変長引数サポートしていたり、メソッドのオーバーロードができたりすればもっとすっきりできそう。</p></article><section class="article labels"><a class=tag href=/tags/dart/>dart</a></section><section class="article author"><p class=name>vateira</p><div class=bio>webサービス、モバイルアプリ中心のプロマネ兼ソフトウェアエンジニア。</div><div class=details></div></section></div><div class="article bottom"><section class="article navigation"><p><a class=link href=/posts/005-dart-pipeline/><span class="iconfont icon-article"></span>Dartでパイプライン演算子的なのを作る</a></p></section></div></section><section id=footer><div class=footer-wrap><p class=copyright>vateira</p><p class=powerby><span>Powered&nbsp;by&nbsp;</span><a href=https://gohugo.io target=_blank rel="noopener noreferrer">Hugo</a><span>&nbsp;&&nbsp;</span><a href=https://themes.gohugo.io/hugo-notepadium/ target=_blank rel="noopener noreferrer">Notepadium</a></p></div></section><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-195243970-1','auto'),ga('send','pageview'))</script><script async src=https://www.google-analytics.com/analytics.js></script></body></html>
