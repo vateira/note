@@ -15,7 +15,12 @@ googleAnalytics = "UA-195243970-1"
     bio = "webサービス、モバイルアプリ中心のプロマネ兼ソフトウェアエンジニア。"
 
 [params.comments]
-    enable = true
+    enable = false
+
+[params.nav]
+showTags = true       
+
+
 
 
 [[params.nav.custom]]
