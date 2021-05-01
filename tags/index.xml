@@ -271,17 +271,26 @@ List&lt;span style="color:#f92672">&amp;lt;&lt;/span>&lt;span style="color:#66d9
 詳しくは&lt;a href="http://example.org/posts/works/">これまでの実績例&lt;/a>
 をご覧ください。&lt;/p>
 &lt;ul>
-&lt;li>プロジェクトマネジメント&lt;/li>
+&lt;li>プロジェクトマネジメント
+&lt;ul>
+&lt;li>要求からの仕様策定など&lt;/li>
+&lt;li>バックログの管理, 進捗管理など&lt;/li>
+&lt;/ul>
+&lt;/li>
 &lt;li>ソフトウェア開発(web フロントエンド, サーバサイド, モバイルアプリ開発)
 &lt;ul>
-&lt;li>web フロントエンド: Svelte / Vue / JQuery / Elm など&lt;/li>
-&lt;li>モバイルアプリ: Flutter など&lt;/li>
-&lt;li>サーバサイド: TypeScript / php / dart / python など&lt;/li>
+&lt;li>web フロントエンド: Svelte, Elm, JQuery, Vue など&lt;/li>
+&lt;li>モバイルアプリ: Flutter, Kotlin など&lt;/li>
+&lt;li>サーバサイド: TypeScript, php, dart, python など&lt;/li>
 &lt;/ul>
 &lt;/li>
 &lt;/ul>
-&lt;p>料金の目安としては業務内容の専門性や職務範囲などに応じて 3,000〜15,000 円/時で計算しています。
-プロジェクトや会社の予算感等を 提示していただければ、その範囲で可能な業務内容をこちらから提案させていただくことも可能です。&lt;/p></description></item><item><title>これまでの仕事の例</title><link>http://example.org/posts/works/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>http://example.org/posts/works/</guid><description>&lt;p>フルタイム以外の場合の事例です。&lt;/p>
+&lt;p>料金の目安としては業務内容の専門性や職務範囲などに応じて凡そ 3,000〜10,000 円/時で計算しています。
+プロジェクトや会社の予算感等を提示していただければ、その範囲で可能な業務内容をこちらから提案させていただくことも可能です。&lt;/p></description></item><item><title>これまでの仕事の例</title><link>http://example.org/posts/works/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>http://example.org/posts/works/</guid><description>&lt;h2 id="フルタイム">フルタイム&lt;/h2>
+&lt;p>ハードウェア製品の研究開発を経て、web 業界へ転職。
+マザーズ上場企業へのスクラムの導入や新規サービス開発、UX ファームでの自社プロダクト開発などに携わる。&lt;/p>
+&lt;p>現在はスタートアップにてプロダクト開発初期から開発責任者(CDO)として関わり、開発進捗管理、ソフトウェアの設計/実装、チームマネジメントを担当している。&lt;/p>
+&lt;h2 id="フルタイム以外の事例">フルタイム以外の事例&lt;/h2>
 &lt;h3 id="プロジェクトマネジメント">プロジェクトマネジメント&lt;/h3>
 &lt;ol>
 &lt;li>スタートアップのプロダクト開発のプロジェクトマネジメント
