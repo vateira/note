@@ -1,4 +1,87 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>設計 on vateira</title><link>http://example.org/tags/%E8%A8%AD%E8%A8%88/</link><description>Recent content in 設計 on vateira</description><generator>Hugo -- gohugo.io</generator><language>ja_jp</language><lastBuildDate>Thu, 22 Apr 2021 18:18:03 +0900</lastBuildDate><atom:link href="http://example.org/tags/%E8%A8%AD%E8%A8%88/index.xml" rel="self" type="application/rss+xml"/><item><title>Zigで「はりぼて言語」をつくる</title><link>http://example.org/posts/008-zig-haribote/</link><pubDate>Fri, 30 Apr 2021 10:00:00 +0900</pubDate><guid>http://example.org/posts/008-zig-haribote/</guid><description>&lt;p>Twitter で&lt;a href="http://essen.osask.jp/?a21_txt01"target="_blank" rel="noopener noreferrer">はりぼて言語&lt;/a>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>設計 on vateira</title><link>http://example.org/tags/%E8%A8%AD%E8%A8%88/</link><description>Recent content in 設計 on vateira</description><generator>Hugo -- gohugo.io</generator><language>ja_jp</language><lastBuildDate>Thu, 22 Apr 2021 18:18:03 +0900</lastBuildDate><atom:link href="http://example.org/tags/%E8%A8%AD%E8%A8%88/index.xml" rel="self" type="application/rss+xml"/><item><title>DartでBrainf*ckインタプリタ</title><link>http://example.org/posts/009-dart-bf/</link><pubDate>Sun, 02 May 2021 20:56:04 +0900</pubDate><guid>http://example.org/posts/009-dart-bf/</guid><description>&lt;p>特にゴルフとか捻りとかもなく愚直に書いた Brainf*ck 処理系。
+コードとメモリは同じクラス(_Tape)のインスタンスにしている。&lt;/p>
+&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-dart" data-lang="dart">&lt;span style="color:#66d9ef">class&lt;/span> &lt;span style="color:#a6e22e">Bf&lt;/span> {
+&lt;span style="color:#66d9ef">final&lt;/span> _Tape&lt;span style="color:#f92672">&amp;lt;&lt;/span>&lt;span style="color:#66d9ef">String&lt;/span>&lt;span style="color:#f92672">&amp;gt;&lt;/span> _code;
+Bf(&lt;span style="color:#66d9ef">String&lt;/span> code) &lt;span style="color:#f92672">:&lt;/span> _code &lt;span style="color:#f92672">=&lt;/span> _Tape(code.split(&lt;span style="color:#e6db74">&amp;#39;&amp;#39;&lt;/span>));
+&lt;span style="color:#66d9ef">void&lt;/span> eval() {
+&lt;span style="color:#66d9ef">var&lt;/span> memory &lt;span style="color:#f92672">=&lt;/span> _Tape(List.filled(&lt;span style="color:#ae81ff">1024&lt;/span>, &lt;span style="color:#ae81ff">0&lt;/span>));
+&lt;span style="color:#66d9ef">var&lt;/span> out &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#39;&amp;#39;&lt;/span>;
+&lt;span style="color:#66d9ef">do&lt;/span> {
+&lt;span style="color:#66d9ef">switch&lt;/span> (_code.cur) {
+&lt;span style="color:#66d9ef">case&lt;/span> &lt;span style="color:#e6db74">&amp;#39;&amp;gt;&amp;#39;&lt;/span>&lt;span style="color:#f92672">:&lt;/span>
+memory.forward();
+&lt;span style="color:#66d9ef">break&lt;/span>;
+&lt;span style="color:#66d9ef">case&lt;/span> &lt;span style="color:#e6db74">&amp;#39;&amp;lt;&amp;#39;&lt;/span>&lt;span style="color:#f92672">:&lt;/span>
+memory.backward();
+&lt;span style="color:#66d9ef">break&lt;/span>;
+&lt;span style="color:#66d9ef">case&lt;/span> &lt;span style="color:#e6db74">&amp;#39;+&amp;#39;&lt;/span>&lt;span style="color:#f92672">:&lt;/span>
+memory.inc();
+&lt;span style="color:#66d9ef">break&lt;/span>;
+&lt;span style="color:#66d9ef">case&lt;/span> &lt;span style="color:#e6db74">&amp;#39;-&amp;#39;&lt;/span>&lt;span style="color:#f92672">:&lt;/span>
+memory.dec();
+&lt;span style="color:#66d9ef">break&lt;/span>;
+&lt;span style="color:#66d9ef">case&lt;/span> &lt;span style="color:#e6db74">&amp;#39;.&amp;#39;&lt;/span>&lt;span style="color:#f92672">:&lt;/span>
+out &lt;span style="color:#f92672">+=&lt;/span> &lt;span style="color:#66d9ef">String&lt;/span>.fromCharCode(memory.cur);
+&lt;span style="color:#66d9ef">break&lt;/span>;
+&lt;span style="color:#66d9ef">case&lt;/span> &lt;span style="color:#e6db74">&amp;#39;]&amp;#39;&lt;/span>&lt;span style="color:#f92672">:&lt;/span>
+&lt;span style="color:#66d9ef">if&lt;/span> (memory.cur &lt;span style="color:#f92672">&amp;gt;&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>) {
+&lt;span style="color:#66d9ef">var&lt;/span> depth &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>;
+&lt;span style="color:#66d9ef">do&lt;/span> {
+&lt;span style="color:#66d9ef">switch&lt;/span> (_code.cur) {
+&lt;span style="color:#66d9ef">case&lt;/span> &lt;span style="color:#e6db74">&amp;#39;]&amp;#39;&lt;/span>&lt;span style="color:#f92672">:&lt;/span>
+depth &lt;span style="color:#f92672">+=&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>;
+&lt;span style="color:#66d9ef">break&lt;/span>;
+&lt;span style="color:#66d9ef">case&lt;/span> &lt;span style="color:#e6db74">&amp;#39;[&amp;#39;&lt;/span>&lt;span style="color:#f92672">:&lt;/span>
+depth &lt;span style="color:#f92672">-=&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>;
+&lt;span style="color:#66d9ef">break&lt;/span>;
+}
+_code.backward();
+} &lt;span style="color:#66d9ef">while&lt;/span> (depth &lt;span style="color:#f92672">!=&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>);
+}
+}
+_code.forward();
+} &lt;span style="color:#66d9ef">while&lt;/span> (_code.forwardable);
+print(out);
+}
+}
+&lt;span style="color:#66d9ef">class&lt;/span> &lt;span style="color:#a6e22e">_Tape&lt;/span>&lt;span style="color:#f92672">&amp;lt;&lt;/span>T&lt;span style="color:#f92672">&amp;gt;&lt;/span> {
+&lt;span style="color:#66d9ef">final&lt;/span> List&lt;span style="color:#f92672">&amp;lt;&lt;/span>T&lt;span style="color:#f92672">&amp;gt;&lt;/span> data;
+&lt;span style="color:#66d9ef">int&lt;/span> _index;
+_Tape(&lt;span style="color:#66d9ef">this&lt;/span>.data) &lt;span style="color:#f92672">:&lt;/span> _index &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>;
+T &lt;span style="color:#66d9ef">get&lt;/span> cur &lt;span style="color:#f92672">=&amp;gt;&lt;/span> data[_index];
+&lt;span style="color:#66d9ef">void&lt;/span> forward() {
+_index &lt;span style="color:#f92672">+=&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>;
+}
+&lt;span style="color:#66d9ef">void&lt;/span> backward() {
+_index &lt;span style="color:#f92672">-=&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>;
+}
+&lt;span style="color:#66d9ef">bool&lt;/span> &lt;span style="color:#66d9ef">get&lt;/span> forwardable &lt;span style="color:#f92672">=&amp;gt;&lt;/span> _index &lt;span style="color:#f92672">&amp;lt;&lt;/span> data.length;
+}
+extension _Memory on _Tape&lt;span style="color:#f92672">&amp;lt;&lt;/span>&lt;span style="color:#66d9ef">int&lt;/span>&lt;span style="color:#f92672">&amp;gt;&lt;/span> {
+&lt;span style="color:#66d9ef">void&lt;/span> inc() {
+data[_index]&lt;span style="color:#f92672">++&lt;/span>;
+}
+&lt;span style="color:#66d9ef">void&lt;/span> dec() {
+data[_index]&lt;span style="color:#f92672">--&lt;/span>;
+}
+}
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>呼び出しがわ&lt;/p>
+&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-dart" data-lang="dart">
+&lt;span style="color:#66d9ef">void&lt;/span> main(List&lt;span style="color:#f92672">&amp;lt;&lt;/span>&lt;span style="color:#66d9ef">String&lt;/span>&lt;span style="color:#f92672">&amp;gt;&lt;/span> arguments) {
+&lt;span style="color:#66d9ef">final&lt;/span> code &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#39;&amp;#39;&amp;#39;
+&lt;/span>&lt;span style="color:#e6db74"> &amp;gt;+++++++++[&amp;lt;++++++++&amp;gt;-]&amp;lt;.&amp;gt;+++++++[&amp;lt;++++&amp;gt;-]
+&lt;/span>&lt;span style="color:#e6db74"> &amp;lt;+.+++++++..+++.[-]&amp;gt;++++++++[&amp;lt;++++&amp;gt;-]&amp;lt;.&amp;gt;++
+&lt;/span>&lt;span style="color:#e6db74"> +++++++++[&amp;lt;+++++&amp;gt;-]&amp;lt;.&amp;gt;++++++++[&amp;lt;+++&amp;gt;-]&amp;lt;.++
+&lt;/span>&lt;span style="color:#e6db74"> +.------.--------.[-]&amp;gt;++++++++[&amp;lt;++++&amp;gt;-]&amp;lt;+.[
+&lt;/span>&lt;span style="color:#e6db74"> -]++++++++++.
+&lt;/span>&lt;span style="color:#e6db74"> &amp;#39;&amp;#39;&amp;#39;&lt;/span>;
+&lt;span style="color:#66d9ef">final&lt;/span> bf &lt;span style="color:#f92672">=&lt;/span> Bf(code);
+bf.eval();
+}
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>実行&lt;/p>
+&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-sh" data-lang="sh">% dart run
+Hello World!
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Zigで「はりぼて言語」をつくる</title><link>http://example.org/posts/008-zig-haribote/</link><pubDate>Fri, 30 Apr 2021 10:00:00 +0900</pubDate><guid>http://example.org/posts/008-zig-haribote/</guid><description>&lt;p>Twitter で&lt;a href="http://essen.osask.jp/?a21_txt01"target="_blank" rel="noopener noreferrer">はりぼて言語&lt;/a>
 を見かけたので、Zig で実装してみる。&lt;/p>
 &lt;p>ほぼそのままだけど、Zig でのコマンドライン引数の扱いをまだ把握していないのでファイル名は固定。&lt;/p>
 &lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-zig" data-lang="zig">&lt;span style="color:#66d9ef">const&lt;/span> std &lt;span style="color:#f92672">=&lt;/span> @import(&lt;span style="color:#e6db74">&amp;#34;std&amp;#34;&lt;/span>);
@@ -286,85 +369,4 @@ List&lt;span style="color:#f92672">&amp;lt;&lt;/span>&lt;span style="color:#66d9
 &lt;/li>
 &lt;/ul>
 &lt;p>料金の目安としては業務内容の専門性や職務範囲などに応じて凡そ 3,000〜10,000 円/時で計算しています。
-プロジェクトや会社の予算感等を提示していただければ、その範囲で可能な業務内容をこちらから提案させていただくことも可能です。&lt;/p></description></item><item><title>これまでの仕事の例</title><link>http://example.org/posts/works/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>http://example.org/posts/works/</guid><description>&lt;h2 id="フルタイム">フルタイム&lt;/h2>
-&lt;p>ハードウェア製品の研究開発を経て、web 業界へ転職。
-マザーズ上場企業へのスクラムの導入や新規サービス開発、UX ファームでの自社プロダクト開発などに携わる。&lt;/p>
-&lt;p>現在はスタートアップにてプロダクト開発初期から開発責任者(CDO)として関わり、開発進捗管理、ソフトウェアの設計/実装、チームマネジメントを担当している。&lt;/p>
-&lt;h2 id="フルタイム以外の事例">フルタイム以外の事例&lt;/h2>
-&lt;h3 id="プロジェクトマネジメント">プロジェクトマネジメント&lt;/h3>
-&lt;ol>
-&lt;li>スタートアップのプロダクト開発のプロジェクトマネジメント
-&lt;ul>
-&lt;li>エンジニア数名及び、オフショアで開発を外注しているプロジェクトのマネジメントを担当。また UI デザインと開発の一部を担当&lt;/li>
-&lt;li>期間: 10 ヶ月(週 8〜32 時間)&lt;/li>
-&lt;li>使用技術
-&lt;ul>
-&lt;li>インフラ, サーバサイド: サーバレスアーキテクチャ(AWS)&lt;/li>
-&lt;li>モバイルアプリ: Swift/Kotlin&lt;/li>
-&lt;li>UI デザイン: Adobe Illustrator, Adobe XD&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ol>
-&lt;h3 id="ソフトウェアエンジニア">ソフトウェアエンジニア&lt;/h3>
-&lt;ol>
-&lt;li>東証一部上場企業のシステム内製化
-&lt;ul>
-&lt;li>外注で製作していたサービスを内製化するにあたり、システムの移行や、エンジニアが少ない社内環境で運用するためのツールの開発などを相談を受けながら作成した。ソフトウェア周辺は個人で担当、インフラについては社内インフラエンジニアの相談に回答する形で対応。&lt;/li>
-&lt;li>期間: 10 ヶ月(週 16 時間前後)&lt;/li>
-&lt;li>使用技術
-&lt;ul>
-&lt;li>インフラ: AWS&lt;/li>
-&lt;li>サーバサイド: CakePHP&lt;/li>
-&lt;li>フロントエンド: Vue&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>ある疾患の患者を介護する家族をサポートする web サービスのプロトタイプ開発
-&lt;ul>
-&lt;li>国立大学法人及び某企業の研究所の共同研究におけるシステムのプロトタイプ開発を受託&lt;/li>
-&lt;li>研究の担当者や学生と相談しながら、サービスのデザインや実装(サーバサイド/web フロントエンド)を開発&lt;/li>
-&lt;li>期間: 6 ヶ月(実験等が行われる都度フィードバックを受けて改修するため連続ではない)&lt;/li>
-&lt;li>使用技術
-&lt;ul>
-&lt;li>インフラ: 依頼者の管理するサーバー(Ubuntu)a&lt;/li>
-&lt;li>サーバサイド: php&lt;/li>
-&lt;li>フロントエンド: php/JavaScript&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>大学学校法人の認知心理学の実験用システムの開発
-&lt;ul>
-&lt;li>特定のタスクに対する反応速度などを計測するためのアプリを開発&lt;/li>
-&lt;li>ミニゲーム形式で操作などに対する速度を計測するデスクトップアプリ&lt;/li>
-&lt;li>研究の目的や調べたい事項などを聞きながら仕様などを提案した&lt;/li>
-&lt;li>研究の責任者や学生(非情報系)が VB.net であればメンテナンスできるということで VB.net で開発&lt;/li>
-&lt;li>実験用の操作デバイスを Mbed で製作&lt;/li>
-&lt;li>期間: 6 ヶ月(実験等が行われる都度フィードバックを受けて改修するため連続ではない)&lt;/li>
-&lt;li>使用技術
-&lt;ul>
-&lt;li>デスクトップアプリ: VB.net&lt;/li>
-&lt;li>操作用デバイス: Mbed&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ol>
-&lt;h3 id="ui-デザイン">UI デザイン&lt;/h3>
-&lt;ol>
-&lt;li>産業機器の操作画面の画面デザイン
-&lt;ul>
-&lt;li>工場等で稼働する産業機器を操作するためのアプリケーションの画面デザインを担当&lt;/li>
-&lt;li>製品が取得する ISO などの規格や、産業機器の誤操作を防ぐための認知心理学的な知見を考慮してデザインを進めた&lt;/li>
-&lt;li>12 ヶ月(週 8 時間前後)&lt;/li>
-&lt;li>使用技術
-&lt;ul>
-&lt;li>デザイン: Adobe Illustrator&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ol></description></item></channel></rss>
+プロジェクトや会社の予算感等を提示していただければ、その範囲で可能な業務内容をこちらから提案させていただくことも可能です。&lt;/p></description></item></channel></rss>

@@ -1,0 +1,91 @@
+<!doctype html><html lang=en><meta charset=utf-8><meta name=generator content="Hugo 0.83.0"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name=color-scheme content="light dark"><meta name=supported-color-schemes content="light dark"><title>DartでBrainf*ckインタプリタ&nbsp;&ndash;&nbsp;vateira</title><link rel=stylesheet href=/css/core.min.8a20650921066633f421ce7a745e34cd4032f36a72cc46f51a06d1fe62549284c37e461fd23cd89b3f123ccdc212cd1b.css integrity=sha384-iiBlCSEGZjP0Ic56dF40zUAy82pyzEb1GgbR/mJUkoTDfkYf0jzYmz8SPM3CEs0b><meta name=twitter:card content="summary"><meta name=twitter:title content="DartでBrainf*ckインタプリタ"><meta name=robots content="noindex,nofollow"><body><section id=header><div class="header wrap"><span class="header left-side"><a class="site home" href=/><span class="site name">vateira</span></a></span>
+<span class="header right-side"><div class="nav wrap"><nav class=nav><a class="nav item" href=/tags/>Tags</a><a class="nav item" href=/posts/works>これまでの仕事の例</a><a class="nav item" href=/posts/jobs>お仕事について</a></nav></div></span></div></section><section id=content><div class=article-container><section class="article header"><h1 class="article title">DartでBrainf*ckインタプリタ</h1><p class="article date">2021-05-02</p></section><article class="article markdown-body"><p>特にゴルフとか捻りとかもなく愚直に書いた Brainf*ck 処理系。
+コードとメモリは同じクラス(_Tape)のインスタンスにしている。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-dart data-lang=dart><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Bf</span> {
+  <span style=color:#66d9ef>final</span> _Tape<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>String</span><span style=color:#f92672>&gt;</span> _code;
+  Bf(<span style=color:#66d9ef>String</span> code) <span style=color:#f92672>:</span> _code <span style=color:#f92672>=</span> _Tape(code.split(<span style=color:#e6db74>&#39;&#39;</span>));
+
+  <span style=color:#66d9ef>void</span> eval() {
+    <span style=color:#66d9ef>var</span> memory <span style=color:#f92672>=</span> _Tape(List.filled(<span style=color:#ae81ff>1024</span>, <span style=color:#ae81ff>0</span>));
+    <span style=color:#66d9ef>var</span> out <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;&#39;</span>;
+    <span style=color:#66d9ef>do</span> {
+      <span style=color:#66d9ef>switch</span> (_code.cur) {
+        <span style=color:#66d9ef>case</span> <span style=color:#e6db74>&#39;&gt;&#39;</span><span style=color:#f92672>:</span>
+          memory.forward();
+          <span style=color:#66d9ef>break</span>;
+        <span style=color:#66d9ef>case</span> <span style=color:#e6db74>&#39;&lt;&#39;</span><span style=color:#f92672>:</span>
+          memory.backward();
+          <span style=color:#66d9ef>break</span>;
+        <span style=color:#66d9ef>case</span> <span style=color:#e6db74>&#39;+&#39;</span><span style=color:#f92672>:</span>
+          memory.inc();
+          <span style=color:#66d9ef>break</span>;
+        <span style=color:#66d9ef>case</span> <span style=color:#e6db74>&#39;-&#39;</span><span style=color:#f92672>:</span>
+          memory.dec();
+          <span style=color:#66d9ef>break</span>;
+        <span style=color:#66d9ef>case</span> <span style=color:#e6db74>&#39;.&#39;</span><span style=color:#f92672>:</span>
+          out <span style=color:#f92672>+=</span> <span style=color:#66d9ef>String</span>.fromCharCode(memory.cur);
+          <span style=color:#66d9ef>break</span>;
+        <span style=color:#66d9ef>case</span> <span style=color:#e6db74>&#39;]&#39;</span><span style=color:#f92672>:</span>
+          <span style=color:#66d9ef>if</span> (memory.cur <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span>) {
+            <span style=color:#66d9ef>var</span> depth <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+            <span style=color:#66d9ef>do</span> {
+              <span style=color:#66d9ef>switch</span> (_code.cur) {
+                <span style=color:#66d9ef>case</span> <span style=color:#e6db74>&#39;]&#39;</span><span style=color:#f92672>:</span>
+                  depth <span style=color:#f92672>+=</span> <span style=color:#ae81ff>1</span>;
+                  <span style=color:#66d9ef>break</span>;
+                <span style=color:#66d9ef>case</span> <span style=color:#e6db74>&#39;[&#39;</span><span style=color:#f92672>:</span>
+                  depth <span style=color:#f92672>-=</span> <span style=color:#ae81ff>1</span>;
+                  <span style=color:#66d9ef>break</span>;
+              }
+              _code.backward();
+            } <span style=color:#66d9ef>while</span> (depth <span style=color:#f92672>!=</span> <span style=color:#ae81ff>0</span>);
+          }
+      }
+      _code.forward();
+    } <span style=color:#66d9ef>while</span> (_code.forwardable);
+    print(out);
+  }
+}
+
+<span style=color:#66d9ef>class</span> <span style=color:#a6e22e>_Tape</span><span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span> {
+  <span style=color:#66d9ef>final</span> List<span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span> data;
+  <span style=color:#66d9ef>int</span> _index;
+
+  _Tape(<span style=color:#66d9ef>this</span>.data) <span style=color:#f92672>:</span> _index <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+
+  T <span style=color:#66d9ef>get</span> cur <span style=color:#f92672>=&gt;</span> data[_index];
+
+  <span style=color:#66d9ef>void</span> forward() {
+    _index <span style=color:#f92672>+=</span> <span style=color:#ae81ff>1</span>;
+  }
+
+  <span style=color:#66d9ef>void</span> backward() {
+    _index <span style=color:#f92672>-=</span> <span style=color:#ae81ff>1</span>;
+  }
+
+  <span style=color:#66d9ef>bool</span> <span style=color:#66d9ef>get</span> forwardable <span style=color:#f92672>=&gt;</span> _index <span style=color:#f92672>&lt;</span> data.length;
+}
+
+extension _Memory on _Tape<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>int</span><span style=color:#f92672>&gt;</span> {
+  <span style=color:#66d9ef>void</span> inc() {
+    data[_index]<span style=color:#f92672>++</span>;
+  }
+
+  <span style=color:#66d9ef>void</span> dec() {
+    data[_index]<span style=color:#f92672>--</span>;
+  }
+}
+</code></pre></div><p>呼び出しがわ</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-dart data-lang=dart>
+<span style=color:#66d9ef>void</span> main(List<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>String</span><span style=color:#f92672>&gt;</span> arguments) {
+  <span style=color:#66d9ef>final</span> code <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;&#39;&#39;
+</span><span style=color:#e6db74>    &gt;+++++++++[&lt;++++++++&gt;-]&lt;.&gt;+++++++[&lt;++++&gt;-]
+</span><span style=color:#e6db74>    &lt;+.+++++++..+++.[-]&gt;++++++++[&lt;++++&gt;-]&lt;.&gt;++
+</span><span style=color:#e6db74>    +++++++++[&lt;+++++&gt;-]&lt;.&gt;++++++++[&lt;+++&gt;-]&lt;.++
+</span><span style=color:#e6db74>    +.------.--------.[-]&gt;++++++++[&lt;++++&gt;-]&lt;+.[
+</span><span style=color:#e6db74>    -]++++++++++.
+</span><span style=color:#e6db74>  &#39;&#39;&#39;</span>;
+  <span style=color:#66d9ef>final</span> bf <span style=color:#f92672>=</span> Bf(code);
+  bf.eval();
+}
+</code></pre></div><p>実行</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>% dart run
+Hello World!
+</code></pre></div></article><section class="article labels"><a class=tag href=/tags/dart/>dart</a></section><section class="article author"><p class=name>vateira</p><div class=bio>webサービス、モバイルアプリ中心のプロマネ兼ソフトウェアエンジニア。</div><div class=details></div></section></div><div class="article bottom"><section class="article navigation"><p><a class=link href=/posts/008-zig-haribote/><span class="iconfont icon-article"></span>Zigで「はりぼて言語」をつくる</a></p></section></div></section><section id=footer><div class=footer-wrap><p class=copyright>vateira</p><p class=powerby><span>Powered&nbsp;by&nbsp;</span><a href=https://gohugo.io target=_blank rel="noopener noreferrer">Hugo</a><span>&nbsp;&&nbsp;</span><a href=https://themes.gohugo.io/hugo-notepadium/ target=_blank rel="noopener noreferrer">Notepadium</a></p></div></section><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-195243970-1','auto'),ga('send','pageview'))</script><script async src=https://www.google-analytics.com/analytics.js></script></body></html>
