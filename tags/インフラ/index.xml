@@ -1,4 +1,14 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>インフラ on vateira</title><link>http://example.org/tags/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/</link><description>Recent content in インフラ on vateira</description><generator>Hugo -- gohugo.io</generator><language>ja_jp</language><lastBuildDate>Wed, 21 Apr 2021 21:45:50 +0900</lastBuildDate><atom:link href="http://example.org/tags/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/index.xml" rel="self" type="application/rss+xml"/><item><title>DartでBrainf*ckインタプリタ</title><link>http://example.org/posts/009-dart-bf/</link><pubDate>Sun, 02 May 2021 20:56:04 +0900</pubDate><guid>http://example.org/posts/009-dart-bf/</guid><description>&lt;p>特にゴルフとか捻りとかもなく愚直に書いた Brainf*ck 処理系。
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>インフラ on vateira</title><link>http://example.org/tags/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/</link><description>Recent content in インフラ on vateira</description><generator>Hugo -- gohugo.io</generator><language>ja_jp</language><lastBuildDate>Wed, 21 Apr 2021 21:45:50 +0900</lastBuildDate><atom:link href="http://example.org/tags/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/index.xml" rel="self" type="application/rss+xml"/><item><title>アジャイルな開発でも仕様をドキュメント化することについて</title><link>http://example.org/posts/010-writing-specs/</link><pubDate>Thu, 06 May 2021 22:24:39 +0900</pubDate><guid>http://example.org/posts/010-writing-specs/</guid><description>&lt;p>アジャイルな開発ではドキュメントレスが取り上げられ、テストファーストが重要視されることから、仕様をドキュメントにまとめるということについてこれまでの体感では賛否両論色々あるように思う。
+ここ三年ほど関わっている web サービスのプロジェクトでは、特にサーバーサイドに関しては仕様記述を割合しっかりと行っている。&lt;/p>
+&lt;p>このプロジェクトでは、最初はクライアントサイドとサーバサイドの両方において VDM++を使い仕様ドキュメントを作成していた。
+といっても主にクライアントサイドは陰関数定義などが主体であり、trace などを使った仕様の検証はあまりしなかったがメンバーが共通の書き方で仕様を作成できてツールによって文法チェックができるという点で非常に良かったと思う。&lt;/p>
+&lt;p>ただし、いくら軽量形式手法とはいってもそれなりに作成に工数がかかることは事実で、ここ二年弱はクライアントサイドは yaml 形式で画面の構成とコントロールに対するイベントを決まった構造で記述し自前のツールで検証して markdown のドキュメンに変換するような DSL へと変わっていった。サーバサイドについても lalrpop を使って json と VDM++が合わさったようなシンタックスの DSL をチームで作り、それを用いるようになっている。
+オレオレ仕様記述は結構色々なところで作られては結局一般的なツールに戻るという話をよく聞くが、現在のプロジェクトでは検証ツールとしての機能性よりも如何に簡単に必要最低限のことができるかに重きを置いているので、それなりに上手くいっているように思う。&lt;/p>
+&lt;p>ただし、やはり大切なのはチームとの相性だろう。&lt;br>
+現在のチームはもともとそういった技術に興味のあるメンバーで構成されているから回っているというのは事実で、エンジニアの関心ごとが別にあればよくある web サービスで導入することが費用対効果に合うかどうかは要検討だ。
+例えばこのチームでは、仕様は json に変換されるのでそれを元にテストコードを生成するツールを実験的に作成してるメンバーもいたりするので、そういった場合は相性が良いだろう。
+特にクライアントサイドについては非機能要件の改修や A/B テストなどの日々のマイナーアップデートなどもあるので、リソース的に厳しいことはよく感じている。&lt;/p>
+&lt;p>個人的には仕様記述により仕様ドキュメントが残っていると、PM としてはエンジニアに確認を取ったり実装を追ったりせずとも仕様が分かるので、PO からのユーザーストーリーをタスクに落とし込む際などに非常に助かっているし、開発メンバー等も slack で実装の議論をする際にドキュメント化された仕様をベースにやりとりをしているので、一般的な web サービスでもそういったコミュニケーションの助けとしても非常に有効かなと思う。&lt;/p></description></item><item><title>DartでBrainf*ckインタプリタ</title><link>http://example.org/posts/009-dart-bf/</link><pubDate>Sun, 02 May 2021 20:56:04 +0900</pubDate><guid>http://example.org/posts/009-dart-bf/</guid><description>&lt;p>特にゴルフとか捻りとかもなく愚直に書いた Brainf*ck 処理系。
 コードとメモリは同じクラス(_Tape)のインスタンスにしている。&lt;/p>
 &lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-dart" data-lang="dart">&lt;span style="color:#66d9ef">class&lt;/span> &lt;span style="color:#a6e22e">Bf&lt;/span> {
 &lt;span style="color:#66d9ef">final&lt;/span> _Tape&lt;span style="color:#f92672">&amp;lt;&lt;/span>&lt;span style="color:#66d9ef">String&lt;/span>&lt;span style="color:#f92672">&amp;gt;&lt;/span> _code;
@@ -347,26 +357,4 @@ List&lt;span style="color:#f92672">&amp;lt;&lt;/span>&lt;span style="color:#66d9
 &lt;span style="color:#66d9ef">throw&lt;/span> &lt;span style="color:#ae81ff">401&lt;/span>;
 }
 });
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>コード量の関係で、リポジトリが&lt;code>DB&lt;/code>というクラスであったり、api サーバが json を返したりすることが前提になっているが、実際はこの辺りは依存性の注入などによって切り替えられるようにしておくと良いだろう。&lt;/p></description></item><item><title>お仕事について</title><link>http://example.org/posts/jobs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>http://example.org/posts/jobs/</guid><description>&lt;h3 id="フルタイム">フルタイム&lt;/h3>
-&lt;p>現在、直接のフルタイムでのスカウト等は承っていません。&lt;/p>
-&lt;h3 id="パートタイム業務委託">パートタイム/業務委託&lt;/h3>
-&lt;p>小〜中規模なプロダクト開発であれば、プロマネやユーティリティプレーヤーとしてお手伝いできると思います。
-詳しくは&lt;a href="http://example.org/posts/works/">これまでの実績例&lt;/a>
-をご覧ください。&lt;/p>
-&lt;ul>
-&lt;li>プロジェクトマネジメント
-&lt;ul>
-&lt;li>要求からの仕様策定など&lt;/li>
-&lt;li>バックログの管理, 進捗管理など&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>ソフトウェア開発(web フロントエンド, サーバサイド, モバイルアプリ開発)
-&lt;ul>
-&lt;li>web フロントエンド: Svelte, Elm, JQuery, Vue など&lt;/li>
-&lt;li>モバイルアプリ: Flutter, Kotlin など&lt;/li>
-&lt;li>サーバサイド: TypeScript, php, dart, python など&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;p>料金の目安としては業務内容の専門性や職務範囲などに応じて凡そ 3,000〜10,000 円/時で計算しています。
-プロジェクトや会社の予算感等を提示していただければ、その範囲で可能な業務内容をこちらから提案させていただくことも可能です。&lt;/p></description></item></channel></rss>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>コード量の関係で、リポジトリが&lt;code>DB&lt;/code>というクラスであったり、api サーバが json を返したりすることが前提になっているが、実際はこの辺りは依存性の注入などによって切り替えられるようにしておくと良いだろう。&lt;/p></description></item></channel></rss>
