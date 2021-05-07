@@ -1,5 +1,6 @@
 ---
 title: "お仕事について"
+date: 9999-01-01T00:00:01+09:00
 categories:
   - introduction
 ---
