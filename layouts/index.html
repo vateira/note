@@ -1,0 +1,13 @@
+{{- define "main" -}}
+{{- partial "homepage-body.html" . -}}
+
+
+{{ $featuredpage := site.GetPage "posts/jobs" }}
+{{ $pages := slice (site.GetPage "posts/jobs") (site.GetPage "posts/works") }}
+{{ $pages = $pages | append (where site.RegularPages "Type" "in" site.Params.mainSections) }}
+
+
+{{- $paginator := .Paginate $pages -}}
+{{- partial "note-list.html" $paginator -}}
+{{- partial "pagination.html" $paginator -}}
+{{- end -}}
