@@ -1,0 +1,199 @@
+<!doctype html><html lang=en><meta charset=utf-8><meta name=generator content="Hugo 0.83.1"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name=color-scheme content="light dark"><meta name=supported-color-schemes content="light dark"><title>elm-satで数独を解く&nbsp;&ndash;&nbsp;vateira</title><link rel=stylesheet href=/css/core.min.8a20650921066633f421ce7a745e34cd4032f36a72cc46f51a06d1fe62549284c37e461fd23cd89b3f123ccdc212cd1b.css integrity=sha384-iiBlCSEGZjP0Ic56dF40zUAy82pyzEb1GgbR/mJUkoTDfkYf0jzYmz8SPM3CEs0b><meta name=twitter:card content="summary"><meta name=twitter:title content="elm-satで数独を解く"><meta name=robots content="noindex,nofollow"><body><section id=header><div class="header wrap"><span class="header left-side"><a class="site home" href=/><span class="site name">vateira</span></a></span>
+<span class="header right-side"><div class="nav wrap"><nav class=nav><a class="nav item" href=/tags/>Tags</a><a class="nav item" href=/posts/works>これまでの仕事の例</a><a class="nav item" href=/posts/jobs>お仕事について</a></nav></div></span></div></section><section id=content><div class=article-container><section class="article header"><h1 class="article title">elm-satで数独を解く</h1><p class="article date">2021-05-09</p></section><article class="article markdown-body"><p><a href=https://package.elm-lang.org/packages/tortis/elm-sat/latest/ target=_blank rel="noopener noreferrer">elm-sat</a>
+という SAT ソルバーの存在を知ったので、数独を解いてみる。変数 mondai を乱数で適当に(数独のルールに従う範囲で)定義するようにすれば数独の問題作成にも(問題として面白いかは別として)使える。</p><p>Qiita あたりに解説とともに載せようかと思ったけど、あまり時間が作れないのでとりあえずコードのみ。</p><p>マニュアルに記載の通り、パフォーマンスで言うと minisat の js バインディングとかの方が良いとのことなので、Elm で Port とか使うの面倒臭いとか遊びの範囲での利用になると思う。
+ただ、CNF 形式のデータを<code>List (List Int)</code>で作成してソルバーに渡せば良いだけなので、インタフェースとしての使い勝手は良い。(とはいえあ自分が使うようなケースだと SMT ソルバーの方が良いと思うけど)</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-elm data-lang=elm><span style=color:#f92672>module </span><span style=color:#a6e22e>Main</span> exposing <span style=color:#a6e22e>(..)</span>
+
+<span style=color:#f92672>import </span><span style=color:#a6e22e>Browser</span>
+<span style=color:#f92672>import </span><span style=color:#a6e22e>Html</span> <span style=color:#66d9ef>as</span> <span style=color:#66d9ef>H</span> exposing (<span style=color:#66d9ef>Html</span>)
+<span style=color:#f92672>import </span><span style=color:#a6e22e>Html.Attributes</span> exposing (style)
+<span style=color:#f92672>import </span><span style=color:#a6e22e>List.Extra</span> <span style=color:#66d9ef>as</span> <span style=color:#66d9ef>List</span>
+<span style=color:#f92672>import </span><span style=color:#a6e22e>Random</span>
+<span style=color:#f92672>import </span><span style=color:#a6e22e>Random.Extra.List</span> <span style=color:#66d9ef>as</span> <span style=color:#66d9ef>RandomList</span>
+<span style=color:#f92672>import </span><span style=color:#a6e22e>Sat</span>
+
+
+<span style=color:#66d9ef>type</span> <span style=color:#66d9ef>alias</span> <span style=color:#66d9ef>Model</span> <span style=color:#a6e22e>=</span>
+    <span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>
+
+
+<span style=color:#66d9ef>type</span> <span style=color:#66d9ef>Msg</span>
+    <span style=color:#a6e22e>=</span> <span style=color:#66d9ef>Seed</span> ( <span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>, <span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span> )
+
+
+<span style=color:#66d9ef>main </span><span style=color:#a6e22e>:</span> <span style=color:#66d9ef>Program</span> () <span style=color:#66d9ef>Model</span> <span style=color:#66d9ef>Msg</span>
+<span style=color:#66d9ef>main </span><span style=color:#a6e22e>=</span>
+    <span style=color:#66d9ef>Browser</span><span style=color:#a6e22e>.</span>element
+        { init <span style=color:#a6e22e>=</span> <span style=color:#a6e22e>\</span>_ <span style=color:#a6e22e>-&gt;</span> ( [], init )
+        , view <span style=color:#a6e22e>=</span>
+            <span style=color:#a6e22e>\</span>code <span style=color:#a6e22e>-&gt;</span>
+                sudoku code
+        , update <span style=color:#a6e22e>=</span> update
+        , subscriptions <span style=color:#a6e22e>=</span> <span style=color:#a6e22e>\</span>_ <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>Sub</span><span style=color:#a6e22e>.</span>none
+        }
+
+
+init <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>Cmd</span> <span style=color:#66d9ef>Msg</span>
+init <span style=color:#a6e22e>=</span>
+    <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>range <span style=color:#ae81ff>2</span> <span style=color:#ae81ff>9</span>
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>RandomList</span><span style=color:#a6e22e>.</span>shuffle
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>Random</span><span style=color:#a6e22e>.</span>map (<span style=color:#a6e22e>(++)</span> [ <span style=color:#ae81ff>1</span> ])
+        <span style=color:#a6e22e>|&gt;</span> (<span style=color:#a6e22e>\</span>x <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>Random</span><span style=color:#a6e22e>.</span>pair x x)
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>Random</span><span style=color:#a6e22e>.</span>generate <span style=color:#66d9ef>Seed</span>
+
+
+update <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>Msg</span> <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>Model</span> <span style=color:#a6e22e>-&gt;</span> ( <span style=color:#66d9ef>Model</span>, <span style=color:#66d9ef>Cmd</span> <span style=color:#66d9ef>Msg</span> )
+update msg model <span style=color:#a6e22e>=</span>
+    ( model, <span style=color:#66d9ef>Cmd</span><span style=color:#a6e22e>.</span>none )
+
+
+mondai <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>List</span> (<span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>)
+mondai <span style=color:#a6e22e>=</span>
+    []
+      <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>append [ [ <span style=color:#ae81ff>1</span> ], [ <span style=color:#ae81ff>11</span> ], [ <span style=color:#ae81ff>21</span> ], [ <span style=color:#ae81ff>31</span> ], [ <span style=color:#ae81ff>41</span> ], [ <span style=color:#ae81ff>51</span> ], [ <span style=color:#ae81ff>61</span> ], [ <span style=color:#ae81ff>71</span> ], [ <span style=color:#ae81ff>81</span> ] ]
+      <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>append [ [ <span style=color:#ae81ff>90</span> ], [ <span style=color:#ae81ff>170</span> ], [ <span style=color:#ae81ff>250</span> ], [ <span style=color:#ae81ff>330</span> ], [ <span style=color:#ae81ff>410</span> ], [ <span style=color:#ae81ff>490</span> ], [ <span style=color:#ae81ff>570</span> ], [ <span style=color:#ae81ff>650</span> ], [ <span style=color:#ae81ff>730</span> ] ]
+
+cnf <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>
+cnf <span style=color:#a6e22e>=</span>
+    vars <span style=color:#ae81ff>81</span>
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>append mondai
+        <span style=color:#a6e22e>|&gt;</span> allLines
+        <span style=color:#a6e22e>|&gt;</span> allCols
+        <span style=color:#a6e22e>|&gt;</span> allBoxes
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>Sat</span><span style=color:#a6e22e>.</span>solve
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>Maybe</span><span style=color:#a6e22e>.</span>map (<span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>filter (<span style=color:#a6e22e>(&lt;)</span> <span style=color:#ae81ff>0</span>))
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>Maybe</span><span style=color:#a6e22e>.</span>withDefault []
+
+
+vars <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>Int</span> <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>List</span> (<span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>)
+vars i <span style=color:#a6e22e>=</span>
+    <span style=color:#66d9ef>case</span> i <span style=color:#66d9ef>of</span>
+        <span style=color:#ae81ff>0</span> <span style=color:#a6e22e>-&gt;</span>
+            []
+
+        _ <span style=color:#a6e22e>-&gt;</span>
+            <span style=color:#66d9ef>let</span>
+                cell <span style=color:#a6e22e>=</span>
+                    (<span style=color:#ae81ff>81</span> <span style=color:#a6e22e>-</span> i) <span style=color:#a6e22e>*</span> <span style=color:#ae81ff>9</span>
+            <span style=color:#66d9ef>in</span>
+            <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>range <span style=color:#ae81ff>1</span> <span style=color:#ae81ff>9</span>
+                <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>map (<span style=color:#a6e22e>\</span>x <span style=color:#a6e22e>-&gt;</span> cell <span style=color:#a6e22e>+</span> x)
+                <span style=color:#a6e22e>|&gt;</span> (<span style=color:#a6e22e>\</span>x <span style=color:#a6e22e>-&gt;</span> x <span style=color:#a6e22e>::</span> vars (i <span style=color:#a6e22e>-</span> <span style=color:#ae81ff>1</span>))
+
+
+allLines <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>List</span> (<span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>) <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>List</span> (<span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>)
+allLines xs <span style=color:#a6e22e>=</span>
+    <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>range <span style=color:#ae81ff>0</span> <span style=color:#ae81ff>8</span>
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>map forEachLine
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>concat
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>append xs
+
+
+forEachLine <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>Int</span> <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>List</span> (<span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>)
+forEachLine y <span style=color:#a6e22e>=</span>
+    <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>range <span style=color:#ae81ff>1</span> <span style=color:#ae81ff>9</span>
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>map (<span style=color:#a6e22e>\</span>n <span style=color:#a6e22e>-&gt;</span> forEachCell<span style=color:#ae81ff>1</span> y n)
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>concat
+
+
+forEachCell<span style=color:#ae81ff>1</span> <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>Int</span> <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>Int</span> <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>List</span> (<span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>)
+forEachCell<span style=color:#ae81ff>1</span> line num <span style=color:#a6e22e>=</span>
+    <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>range <span style=color:#ae81ff>0</span> <span style=color:#ae81ff>8</span>
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>map (<span style=color:#a6e22e>\</span>col <span style=color:#a6e22e>-&gt;</span> (line <span style=color:#a6e22e>*</span> <span style=color:#ae81ff>9</span> <span style=color:#a6e22e>+</span> col) <span style=color:#a6e22e>*</span> <span style=color:#ae81ff>9</span>)
+        <span style=color:#a6e22e>|&gt;</span> (<span style=color:#a6e22e>\</span>xs <span style=color:#a6e22e>-&gt;</span> checkIn xs num)
+
+
+
+<span style=color:#75715e>-- ///</span>
+
+
+allCols <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>List</span> (<span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>) <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>List</span> (<span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>)
+allCols xs <span style=color:#a6e22e>=</span>
+    <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>range <span style=color:#ae81ff>0</span> <span style=color:#ae81ff>8</span>
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>map forEachColumn
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>concat
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>append xs
+
+
+forEachColumn <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>Int</span> <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>List</span> (<span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>)
+forEachColumn x <span style=color:#a6e22e>=</span>
+    <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>range <span style=color:#ae81ff>1</span> <span style=color:#ae81ff>9</span>
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>map (<span style=color:#a6e22e>\</span>n <span style=color:#a6e22e>-&gt;</span> forEachCell<span style=color:#ae81ff>2</span> x n)
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>concat
+
+
+forEachCell<span style=color:#ae81ff>2</span> <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>Int</span> <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>Int</span> <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>List</span> (<span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>)
+forEachCell<span style=color:#ae81ff>2</span> col num <span style=color:#a6e22e>=</span>
+    <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>range <span style=color:#ae81ff>0</span> <span style=color:#ae81ff>8</span>
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>map (<span style=color:#a6e22e>\</span>line <span style=color:#a6e22e>-&gt;</span> (line <span style=color:#a6e22e>*</span> <span style=color:#ae81ff>9</span> <span style=color:#a6e22e>+</span> col) <span style=color:#a6e22e>*</span> <span style=color:#ae81ff>9</span>)
+        <span style=color:#a6e22e>|&gt;</span> (<span style=color:#a6e22e>\</span>xs <span style=color:#a6e22e>-&gt;</span> checkIn xs num)
+
+
+
+<span style=color:#75715e>-- ///</span>
+
+
+allBoxes <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>List</span> (<span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>) <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>List</span> (<span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>)
+allBoxes xs <span style=color:#a6e22e>=</span>
+    <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>range <span style=color:#ae81ff>0</span> <span style=color:#ae81ff>8</span>
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>map forEachBox
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>concat
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>append xs
+
+
+forEachBox <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>Int</span> <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>List</span> (<span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>)
+forEachBox b <span style=color:#a6e22e>=</span>
+    <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>range <span style=color:#ae81ff>1</span> <span style=color:#ae81ff>9</span>
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>map (<span style=color:#a6e22e>\</span>n <span style=color:#a6e22e>-&gt;</span> forEachCell<span style=color:#ae81ff>3</span> b n)
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>concat
+
+
+forEachCell<span style=color:#ae81ff>3</span> <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>Int</span> <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>Int</span> <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>List</span> (<span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>)
+forEachCell<span style=color:#ae81ff>3</span> box num <span style=color:#a6e22e>=</span>
+    <span style=color:#66d9ef>let</span>
+        cells <span style=color:#a6e22e>=</span>
+            [ <span style=color:#ae81ff>0</span>, <span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>9</span>, <span style=color:#ae81ff>10</span>, <span style=color:#ae81ff>11</span>, <span style=color:#ae81ff>18</span>, <span style=color:#ae81ff>19</span>, <span style=color:#ae81ff>20</span> ]
+                <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>map (<span style=color:#a6e22e>(+)</span> (<span style=color:#ae81ff>27</span> <span style=color:#a6e22e>*</span> (box <span style=color:#a6e22e>//</span> <span style=color:#ae81ff>3</span>) <span style=color:#a6e22e>+</span> <span style=color:#ae81ff>3</span> <span style=color:#a6e22e>*</span> remainderBy <span style=color:#ae81ff>3</span> box))
+                <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>map (<span style=color:#a6e22e>(*)</span> <span style=color:#ae81ff>9</span>)
+    <span style=color:#66d9ef>in</span>
+    checkIn cells num
+
+
+
+<span style=color:#75715e>-- ///</span>
+
+
+checkIn <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span> <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>Int</span> <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>List</span> (<span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span>)
+checkIn members num <span style=color:#a6e22e>=</span>
+    members
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>map (<span style=color:#a6e22e>(+)</span> num)
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>map negate
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>uniquePairs
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>map (<span style=color:#a6e22e>\</span>( x, y ) <span style=color:#a6e22e>-&gt;</span> [ x, y ])
+
+
+sudoku <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span> <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>Html</span> <span style=color:#66d9ef>Msg</span>
+sudoku cs <span style=color:#a6e22e>=</span>
+    cs
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>indexedMap
+            (<span style=color:#a6e22e>\</span>i c <span style=color:#a6e22e>-&gt;</span>
+                c <span style=color:#a6e22e>-</span> (i <span style=color:#a6e22e>*</span> <span style=color:#ae81ff>9</span>)
+            )
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>groupsOf <span style=color:#ae81ff>9</span>
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>map sudokuLine
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>H</span><span style=color:#a6e22e>.</span>div []
+
+
+sudokuLine <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>List</span> <span style=color:#66d9ef>Int</span> <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>Html</span> <span style=color:#66d9ef>Msg</span>
+sudokuLine nums <span style=color:#a6e22e>=</span>
+    nums
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>map (<span style=color:#66d9ef>String</span><span style=color:#a6e22e>.</span>fromInt <span style=color:#a6e22e>&gt;&gt;</span> <span style=color:#66d9ef>H</span><span style=color:#a6e22e>.</span>text)
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>map
+            (<span style=color:#a6e22e>\</span>x <span style=color:#a6e22e>-&gt;</span>
+                <span style=color:#66d9ef>H</span><span style=color:#a6e22e>.</span>div
+                    [ style <span style=color:#e6db74>&#34;width&#34;</span> <span style=color:#e6db74>&#34;48px&#34;</span>
+                    , style <span style=color:#e6db74>&#34;height&#34;</span> <span style=color:#e6db74>&#34;48px&#34;</span>
+                    ]
+                    [ x ]
+            )
+        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>H</span><span style=color:#a6e22e>.</span>div [ style <span style=color:#e6db74>&#34;display&#34;</span> <span style=color:#e6db74>&#34;flex&#34;</span> ]
+</code></pre></div></article><section class="article labels"><a class=tag href=/tags/elm/>Elm</a><a class=tag href=/tags/formal-methods/>formal methods</a></section><section class="article author"><p class=name>vateira</p><div class=bio>webサービス、モバイルアプリ中心のプロマネ兼ソフトウェアエンジニア。</div><div class=details></div></section></div><div class="article bottom"><section class="article navigation"><p><a class=link href=/posts/010-writing-specs/><span class="iconfont icon-article"></span>アジャイルな開発でも仕様をドキュメント化することについて</a></p></section></div></section><section id=footer><div class=footer-wrap><p class=copyright>vateira</p><p class=powerby><span>Powered&nbsp;by&nbsp;</span><a href=https://gohugo.io target=_blank rel="noopener noreferrer">Hugo</a><span>&nbsp;&&nbsp;</span><a href=https://themes.gohugo.io/hugo-notepadium/ target=_blank rel="noopener noreferrer">Notepadium</a></p></div></section><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-195243970-1','auto'),ga('send','pageview'))</script><script async src=https://www.google-analytics.com/analytics.js></script></body></html>
