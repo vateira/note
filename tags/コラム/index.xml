@@ -1,4 +1,24 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>コラム on vateira</title><link>http://example.org/tags/%E3%82%B3%E3%83%A9%E3%83%A0/</link><description>Recent content in コラム on vateira</description><generator>Hugo -- gohugo.io</generator><language>ja_jp</language><lastBuildDate>Thu, 06 May 2021 22:24:39 +0900</lastBuildDate><atom:link href="http://example.org/tags/%E3%82%B3%E3%83%A9%E3%83%A0/index.xml" rel="self" type="application/rss+xml"/><item><title>elm-satで数独を解く</title><link>http://example.org/posts/011-sudoku/</link><pubDate>Sun, 09 May 2021 21:30:09 +0900</pubDate><guid>http://example.org/posts/011-sudoku/</guid><description>&lt;p>&lt;a href="https://package.elm-lang.org/packages/tortis/elm-sat/latest/"target="_blank" rel="noopener noreferrer">elm-sat&lt;/a>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>コラム on vateira</title><link>http://example.org/tags/%E3%82%B3%E3%83%A9%E3%83%A0/</link><description>Recent content in コラム on vateira</description><generator>Hugo -- gohugo.io</generator><language>ja_jp</language><lastBuildDate>Thu, 06 May 2021 22:24:39 +0900</lastBuildDate><atom:link href="http://example.org/tags/%E3%82%B3%E3%83%A9%E3%83%A0/index.xml" rel="self" type="application/rss+xml"/><item><title>google/zxとJavaScriptのTagged Templates</title><link>http://example.org/posts/012-tagged-template/</link><pubDate>Tue, 11 May 2021 20:46:33 +0900</pubDate><guid>http://example.org/posts/012-tagged-template/</guid><description>&lt;p>社内の雑談で&lt;a href="https://github.com/google/zx"target="_blank" rel="noopener noreferrer">google/zx&lt;/a>
+が話題になった際に、&lt;code>$`find -type f`&lt;/code>のような構文について質問があったので。&lt;/p>
+&lt;p>特殊な構文でプリプロセスしているとかいうのではなく、これは &lt;a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates"target="_blank" rel="noopener noreferrer">Tagged Templages&lt;/a>
+を使っている。&lt;/p>
+&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-javascript" data-lang="javascript">&lt;span style="color:#66d9ef">function&lt;/span> &lt;span style="color:#a6e22e">hoge&lt;/span>(&lt;span style="color:#a6e22e">strs&lt;/span>, ...&lt;span style="color:#a6e22e">args&lt;/span>) {}
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>のような関数を定義して&lt;/p>
+&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-javascript" data-lang="javascript">&lt;span style="color:#66d9ef">const&lt;/span> &lt;span style="color:#a6e22e">va&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;[a]&amp;#34;&lt;/span>;
+&lt;span style="color:#66d9ef">const&lt;/span> &lt;span style="color:#a6e22e">vb&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;[b]&amp;#34;&lt;/span>;
+&lt;span style="color:#a6e22e">hoge&lt;/span>&lt;span style="color:#e6db74">`a&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>&lt;span style="color:#a6e22e">va&lt;/span>&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">b&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>&lt;span style="color:#a6e22e">vb&lt;/span>&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">`&lt;/span>;
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>とすると、関数&lt;code>hoge&lt;/code>が呼び出され、引数&lt;code>strs&lt;/code>に&lt;code>[&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;]&lt;/code>が、&lt;code>args&lt;/code>に&lt;code>[&amp;quot;[a]&amp;quot;, &amp;quot;[b]&amp;quot;]&lt;/code>が渡される。&lt;/p>
+&lt;p>zx の場合は&lt;/p>
+&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-javascript" data-lang="javascript">&lt;span style="color:#66d9ef">function&lt;/span> &lt;span style="color:#a6e22e">$&lt;/span>(&lt;span style="color:#a6e22e">strs&lt;/span>, ...&lt;span style="color:#a6e22e">args&lt;/span>) {
+&lt;span style="color:#66d9ef">return&lt;/span> &lt;span style="color:#66d9ef">new&lt;/span> Promise((&lt;span style="color:#a6e22e">resolve&lt;/span>, &lt;span style="color:#a6e22e">reject&lt;/span>) =&amp;gt; {
+&lt;span style="color:#75715e">// execなどにより外部コマンドを実行
+&lt;/span>&lt;span style="color:#75715e">&lt;/span> });
+}
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>のように関数&lt;code>$&lt;/code>を定義しているので、冒頭にあったような&lt;/p>
+&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-javascript" data-lang="javascript">&lt;span style="color:#66d9ef">let&lt;/span> &lt;span style="color:#a6e22e">branch&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#66d9ef">await&lt;/span> &lt;span style="color:#a6e22e">$&lt;/span>&lt;span style="color:#e6db74">`git branch --show-current`&lt;/span>;
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>のような書き方ができる。&lt;/p>
+&lt;p>文字列リテラルに対して何らかの関数を適用できると言う点では、&lt;a href="https://elixir-lang.org/getting-started/sigils.html#custom-sigils"target="_blank" rel="noopener noreferrer">Elixir の sigil&lt;/a>
+に似ていると思う。&lt;/p></description></item><item><title>elm-satで数独を解く</title><link>http://example.org/posts/011-sudoku/</link><pubDate>Sun, 09 May 2021 21:30:09 +0900</pubDate><guid>http://example.org/posts/011-sudoku/</guid><description>&lt;p>&lt;a href="https://package.elm-lang.org/packages/tortis/elm-sat/latest/"target="_blank" rel="noopener noreferrer">elm-sat&lt;/a>
 という SAT ソルバーの存在を知ったので、数独を解いてみる。変数 mondai を乱数で適当に(数独のルールに従う範囲で)定義するようにすれば数独の問題作成にも(問題として面白いかは別として)使える。&lt;/p>
 &lt;p>Qiita あたりに解説とともに載せようかと思ったけど、あまり時間が作れないのでとりあえずコードのみ。&lt;/p>
 &lt;p>マニュアルに記載の通り、パフォーマンスで言うと minisat の js バインディングとかの方が良いとのことなので、Elm で Port とか使うの面倒臭いとか遊びの範囲での利用になると思う。
@@ -470,11 +490,4 @@ Middleware auth() &lt;span style="color:#f92672">=&amp;gt;&lt;/span> (innerHandl
 &lt;td>アプリケーションサーバー。アプリケーションロジックは core を使う。リポジトリは DB などを使う&lt;/td>
 &lt;/tr>
 &lt;/tbody>
-&lt;/table></description></item><item><title>新規プロダクト開発のインフラについて</title><link>http://example.org/posts/002-infra-for-new-products/</link><pubDate>Wed, 21 Apr 2021 21:45:50 +0900</pubDate><guid>http://example.org/posts/002-infra-for-new-products/</guid><description>&lt;p>これはプロダクトがどういったものであるかなどを考慮して決めるものなので、これといった定石は無いとは思っている。&lt;/p>
-&lt;p>ただ「とりあえず何か」という話であれば、自分のように小中規模の組織で web サービスを始めるケースであれば最近は AWS Lightsail が良いのでは無いだろうか。理由は昨年からのコンテナのサポートだ。&lt;/p>
-&lt;p>これから何かプロダクトを作り始めるにあたり、AWS や GCP といった IaaS を利用する際に気になるのはランニングコストだろう。格安とはいえ使い方次第では思った以上に出費が嵩むことも有り得るので、定額で計算できた方が良い。そのあたり Lightsail は見積もり安いし、出費は増えるがマネージド DB やロードバランサも提供されていて、必要最低限のものは一通り揃っている。&lt;/p>
-&lt;p>そして、その Lightsail は去年からコンテナのデプロイができるようになったのだ。
-これで開発環境も実行環境も docker image で共通化が可能だ。例えばサーバサイドとクライアントサイドが別々になっているようなプロダクトであれば、サーバサイドを docker image で共有できるのは間違いなく便利だろう。&lt;/p>
-&lt;p>ECR や dockerhub のプライベートイメージとの連携はサポートされていないのが残念だけれども、GitHub Actions などの CI ツールでコマンドを叩くのもそこまで大変ではない。&lt;/p>
-&lt;p> ここからは個人的な好みになってくるけれども、近頃は deno が面白い。node.js などとは違い、標準で単一の実行バイナリに変換できるので、開発者以外は実行環境を特別に用意する必要がなくて便利。TypeScript での開発も結構生産性が高くて良いと思う。
-今のところ SQL の扱いに関しては、キラーパッケージというか「これだ」というのが出ていないのは少し残念ではあるけれども&amp;hellip;&lt;/p></description></item></channel></rss>
+&lt;/table></description></item></channel></rss>
