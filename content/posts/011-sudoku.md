@@ -20,8 +20,6 @@ import Browser
 import Html as H exposing (Html)
 import Html.Attributes exposing (style)
 import List.Extra as List
-import Random
-import Random.Extra.List as RandomList
 import Sat
 
 
@@ -36,7 +34,7 @@ type Msg
 main : Program () Model Msg
 main =
     Browser.element
-        { init = \_ -> ( [], init )
+        { init = \_ -> ( cnf, Cmd.none )
         , view =
             \code ->
                 sudoku code
@@ -45,13 +43,6 @@ main =
         }
 
 
-init : Cmd Msg
-init =
-    List.range 2 9
-        |> RandomList.shuffle
-        |> Random.map ((++) [ 1 ])
-        |> (\x -> Random.pair x x)
-        |> Random.generate Seed
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
