@@ -1,0 +1,24 @@
+<!doctype html><html lang=en><meta charset=utf-8><meta name=generator content="Hugo 0.83.1"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name=color-scheme content="light dark"><meta name=supported-color-schemes content="light dark"><title>ProcesingのPythonモードでデコレータを使う&nbsp;&ndash;&nbsp;vateira</title><link rel=stylesheet href=/css/core.min.8a20650921066633f421ce7a745e34cd4032f36a72cc46f51a06d1fe62549284c37e461fd23cd89b3f123ccdc212cd1b.css integrity=sha384-iiBlCSEGZjP0Ic56dF40zUAy82pyzEb1GgbR/mJUkoTDfkYf0jzYmz8SPM3CEs0b><meta name=twitter:card content="summary"><meta name=twitter:title content="ProcesingのPythonモードでデコレータを使う"><meta name=robots content="noindex,nofollow"><body><section id=header><div class="header wrap"><span class="header left-side"><a class="site home" href=/><span class="site name">vateira</span></a></span>
+<span class="header right-side"><div class="nav wrap"><nav class=nav><a class="nav item" href=/tags/>Tags</a><a class="nav item" href=/posts/works>これまでの仕事の例</a><a class="nav item" href=/posts/jobs>お仕事について</a></nav></div></span></div></section><section id=content><div class=article-container><section class="article header"><h1 class="article title">ProcesingのPythonモードでデコレータを使う</h1><p class="article date">2021-05-17</p></section><article class="article markdown-body"><p>久々に Processing でアニメーションとかを考えてみようと思ったところ、python モードがあることを思い出したの使ってみる。</p><p>Python モードを試したのは、学生の頃に授業で触った時は Java で書いていたけれども、ここ数年 Java から遠ざかっていたのが大きい。それと、複数のアニメーションを一定の時間毎に切り替えるのにデコレータが使えるかなと思ったから。</p><p>(このあたり Processing で正式な方法があるのかもしれないけど)</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>kFrameRate <span style=color:#f92672>=</span> <span style=color:#ae81ff>60</span>
+
+<span style=color:#66d9ef>def</span> <span style=color:#a6e22e>ms</span>():
+  <span style=color:#66d9ef>return</span> frameCount <span style=color:#f92672>*</span> <span style=color:#ae81ff>1000</span> <span style=color:#f92672>/</span> kFrameRate
+
+<span style=color:#66d9ef>def</span> <span style=color:#a6e22e>animation</span>():
+    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>_animation</span>(f):
+        <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>_wrapper</span>(<span style=color:#f92672>*</span>args, <span style=color:#f92672>**</span>keywords):
+            <span style=color:#66d9ef>if</span> beginAt <span style=color:#f92672>&lt;=</span> ms() <span style=color:#f92672>and</span> ms() <span style=color:#f92672>&lt;=</span> endAt:
+                <span style=color:#66d9ef>return</span> f(<span style=color:#f92672>*</span>args, <span style=color:#f92672>**</span>keywords)
+            <span style=color:#66d9ef>else</span>:
+                <span style=color:#66d9ef>pass</span>
+        <span style=color:#66d9ef>return</span> _wrapper
+    <span style=color:#66d9ef>return</span> _animation
+</code></pre></div><p>のようなデコレータを用意しておけば、</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>draw</span>():
+    animation_01()
+
+
+<span style=color:#a6e22e>@animation</span>(<span style=color:#ae81ff>1000</span>, <span style=color:#ae81ff>2000</span>)
+<span style=color:#66d9ef>def</span> <span style=color:#a6e22e>animation_01</span>():
+    text(<span style=color:#e6db74>&#34;hello!&#34;</span>, <span style=color:#ae81ff>0</span>, <span style=color:#ae81ff>0</span>)
+
+</code></pre></div><p>のようにして指定できる。</p></article><section class="article labels"><a class=tag href=/tags/processing/>processing</a><a class=tag href=/tags/python/>python</a></section><section class="article author"><p class=name>vateira</p><div class=bio>webサービス、モバイルアプリ中心のプロマネ兼ソフトウェアエンジニア。</div><div class=details></div></section></div><div class="article bottom"><section class="article navigation"><p><a class=link href=/posts/012-tagged-template/><span class="iconfont icon-article"></span>google/zxとJavaScriptのTagged Templates</a></p></section></div></section><section id=footer><div class=footer-wrap><p class=copyright>vateira</p><p class=powerby><span>Powered&nbsp;by&nbsp;</span><a href=https://gohugo.io target=_blank rel="noopener noreferrer">Hugo</a><span>&nbsp;&&nbsp;</span><a href=https://themes.gohugo.io/hugo-notepadium/ target=_blank rel="noopener noreferrer">Notepadium</a></p></div></section><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-195243970-1','auto'),ga('send','pageview'))</script><script async src=https://www.google-analytics.com/analytics.js></script></body></html>

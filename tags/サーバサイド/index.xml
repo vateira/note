@@ -1,4 +1,25 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>サーバサイド on vateira</title><link>http://example.org/tags/%E3%82%B5%E3%83%BC%E3%83%90%E3%82%B5%E3%82%A4%E3%83%89/</link><description>Recent content in サーバサイド on vateira</description><generator>Hugo -- gohugo.io</generator><language>ja_jp</language><lastBuildDate>Thu, 22 Apr 2021 18:18:03 +0900</lastBuildDate><atom:link href="http://example.org/tags/%E3%82%B5%E3%83%BC%E3%83%90%E3%82%B5%E3%82%A4%E3%83%89/index.xml" rel="self" type="application/rss+xml"/><item><title>google/zxとJavaScriptのTagged Templates</title><link>http://example.org/posts/012-tagged-template/</link><pubDate>Tue, 11 May 2021 20:46:33 +0900</pubDate><guid>http://example.org/posts/012-tagged-template/</guid><description>&lt;p>社内の雑談で&lt;a href="https://github.com/google/zx"target="_blank" rel="noopener noreferrer">google/zx&lt;/a>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>サーバサイド on vateira</title><link>http://example.org/tags/%E3%82%B5%E3%83%BC%E3%83%90%E3%82%B5%E3%82%A4%E3%83%89/</link><description>Recent content in サーバサイド on vateira</description><generator>Hugo -- gohugo.io</generator><language>ja_jp</language><lastBuildDate>Thu, 22 Apr 2021 18:18:03 +0900</lastBuildDate><atom:link href="http://example.org/tags/%E3%82%B5%E3%83%BC%E3%83%90%E3%82%B5%E3%82%A4%E3%83%89/index.xml" rel="self" type="application/rss+xml"/><item><title>ProcesingのPythonモードでデコレータを使う</title><link>http://example.org/posts/013-procesing-python/</link><pubDate>Mon, 17 May 2021 22:22:29 +0900</pubDate><guid>http://example.org/posts/013-procesing-python/</guid><description>&lt;p>久々に Processing でアニメーションとかを考えてみようと思ったところ、python モードがあることを思い出したの使ってみる。&lt;/p>
+&lt;p>Python モードを試したのは、学生の頃に授業で触った時は Java で書いていたけれども、ここ数年 Java から遠ざかっていたのが大きい。それと、複数のアニメーションを一定の時間毎に切り替えるのにデコレータが使えるかなと思ったから。&lt;/p>
+&lt;p>(このあたり Processing で正式な方法があるのかもしれないけど)&lt;/p>
+&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-python" data-lang="python">kFrameRate &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#ae81ff">60&lt;/span>
+&lt;span style="color:#66d9ef">def&lt;/span> &lt;span style="color:#a6e22e">ms&lt;/span>():
+&lt;span style="color:#66d9ef">return&lt;/span> frameCount &lt;span style="color:#f92672">*&lt;/span> &lt;span style="color:#ae81ff">1000&lt;/span> &lt;span style="color:#f92672">/&lt;/span> kFrameRate
+&lt;span style="color:#66d9ef">def&lt;/span> &lt;span style="color:#a6e22e">animation&lt;/span>():
+&lt;span style="color:#66d9ef">def&lt;/span> &lt;span style="color:#a6e22e">_animation&lt;/span>(f):
+&lt;span style="color:#66d9ef">def&lt;/span> &lt;span style="color:#a6e22e">_wrapper&lt;/span>(&lt;span style="color:#f92672">*&lt;/span>args, &lt;span style="color:#f92672">**&lt;/span>keywords):
+&lt;span style="color:#66d9ef">if&lt;/span> beginAt &lt;span style="color:#f92672">&amp;lt;=&lt;/span> ms() &lt;span style="color:#f92672">and&lt;/span> ms() &lt;span style="color:#f92672">&amp;lt;=&lt;/span> endAt:
+&lt;span style="color:#66d9ef">return&lt;/span> f(&lt;span style="color:#f92672">*&lt;/span>args, &lt;span style="color:#f92672">**&lt;/span>keywords)
+&lt;span style="color:#66d9ef">else&lt;/span>:
+&lt;span style="color:#66d9ef">pass&lt;/span>
+&lt;span style="color:#66d9ef">return&lt;/span> _wrapper
+&lt;span style="color:#66d9ef">return&lt;/span> _animation
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>のようなデコレータを用意しておけば、&lt;/p>
+&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-python" data-lang="python">&lt;span style="color:#66d9ef">def&lt;/span> &lt;span style="color:#a6e22e">draw&lt;/span>():
+animation_01()
+&lt;span style="color:#a6e22e">@animation&lt;/span>(&lt;span style="color:#ae81ff">1000&lt;/span>, &lt;span style="color:#ae81ff">2000&lt;/span>)
+&lt;span style="color:#66d9ef">def&lt;/span> &lt;span style="color:#a6e22e">animation_01&lt;/span>():
+text(&lt;span style="color:#e6db74">&amp;#34;hello!&amp;#34;&lt;/span>, &lt;span style="color:#ae81ff">0&lt;/span>, &lt;span style="color:#ae81ff">0&lt;/span>)
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>のようにして指定できる。&lt;/p></description></item><item><title>google/zxとJavaScriptのTagged Templates</title><link>http://example.org/posts/012-tagged-template/</link><pubDate>Tue, 11 May 2021 20:46:33 +0900</pubDate><guid>http://example.org/posts/012-tagged-template/</guid><description>&lt;p>社内の雑談で&lt;a href="https://github.com/google/zx"target="_blank" rel="noopener noreferrer">google/zx&lt;/a>
 が話題になった際に、&lt;code>$`find -type f`&lt;/code>のような構文について質問があったので。&lt;/p>
 &lt;p>特殊な構文でプリプロセスしているとかいうのではなく、これは &lt;a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates"target="_blank" rel="noopener noreferrer">Tagged Templages&lt;/a>
 を使っている。&lt;/p>
@@ -28,8 +49,6 @@
 &lt;span style="color:#f92672">import &lt;/span>&lt;span style="color:#a6e22e">Html&lt;/span> &lt;span style="color:#66d9ef">as&lt;/span> &lt;span style="color:#66d9ef">H&lt;/span> exposing (&lt;span style="color:#66d9ef">Html&lt;/span>)
 &lt;span style="color:#f92672">import &lt;/span>&lt;span style="color:#a6e22e">Html.Attributes&lt;/span> exposing (style)
 &lt;span style="color:#f92672">import &lt;/span>&lt;span style="color:#a6e22e">List.Extra&lt;/span> &lt;span style="color:#66d9ef">as&lt;/span> &lt;span style="color:#66d9ef">List&lt;/span>
-&lt;span style="color:#f92672">import &lt;/span>&lt;span style="color:#a6e22e">Random&lt;/span>
-&lt;span style="color:#f92672">import &lt;/span>&lt;span style="color:#a6e22e">Random.Extra.List&lt;/span> &lt;span style="color:#66d9ef">as&lt;/span> &lt;span style="color:#66d9ef">RandomList&lt;/span>
 &lt;span style="color:#f92672">import &lt;/span>&lt;span style="color:#a6e22e">Sat&lt;/span>
 &lt;span style="color:#66d9ef">type&lt;/span> &lt;span style="color:#66d9ef">alias&lt;/span> &lt;span style="color:#66d9ef">Model&lt;/span> &lt;span style="color:#a6e22e">=&lt;/span>
 &lt;span style="color:#66d9ef">List&lt;/span> &lt;span style="color:#66d9ef">Int&lt;/span>
@@ -38,20 +57,13 @@
 &lt;span style="color:#66d9ef">main &lt;/span>&lt;span style="color:#a6e22e">:&lt;/span> &lt;span style="color:#66d9ef">Program&lt;/span> () &lt;span style="color:#66d9ef">Model&lt;/span> &lt;span style="color:#66d9ef">Msg&lt;/span>
 &lt;span style="color:#66d9ef">main &lt;/span>&lt;span style="color:#a6e22e">=&lt;/span>
 &lt;span style="color:#66d9ef">Browser&lt;/span>&lt;span style="color:#a6e22e">.&lt;/span>element
-{ init &lt;span style="color:#a6e22e">=&lt;/span> &lt;span style="color:#a6e22e">\&lt;/span>_ &lt;span style="color:#a6e22e">-&amp;gt;&lt;/span> ( [], init )
+{ init &lt;span style="color:#a6e22e">=&lt;/span> &lt;span style="color:#a6e22e">\&lt;/span>_ &lt;span style="color:#a6e22e">-&amp;gt;&lt;/span> ( cnf, &lt;span style="color:#66d9ef">Cmd&lt;/span>&lt;span style="color:#a6e22e">.&lt;/span>none )
 , view &lt;span style="color:#a6e22e">=&lt;/span>
 &lt;span style="color:#a6e22e">\&lt;/span>code &lt;span style="color:#a6e22e">-&amp;gt;&lt;/span>
 sudoku code
 , update &lt;span style="color:#a6e22e">=&lt;/span> update
 , subscriptions &lt;span style="color:#a6e22e">=&lt;/span> &lt;span style="color:#a6e22e">\&lt;/span>_ &lt;span style="color:#a6e22e">-&amp;gt;&lt;/span> &lt;span style="color:#66d9ef">Sub&lt;/span>&lt;span style="color:#a6e22e">.&lt;/span>none
 }
-init &lt;span style="color:#a6e22e">:&lt;/span> &lt;span style="color:#66d9ef">Cmd&lt;/span> &lt;span style="color:#66d9ef">Msg&lt;/span>
-init &lt;span style="color:#a6e22e">=&lt;/span>
-&lt;span style="color:#66d9ef">List&lt;/span>&lt;span style="color:#a6e22e">.&lt;/span>range &lt;span style="color:#ae81ff">2&lt;/span> &lt;span style="color:#ae81ff">9&lt;/span>
-&lt;span style="color:#a6e22e">|&amp;gt;&lt;/span> &lt;span style="color:#66d9ef">RandomList&lt;/span>&lt;span style="color:#a6e22e">.&lt;/span>shuffle
-&lt;span style="color:#a6e22e">|&amp;gt;&lt;/span> &lt;span style="color:#66d9ef">Random&lt;/span>&lt;span style="color:#a6e22e">.&lt;/span>map (&lt;span style="color:#a6e22e">(++)&lt;/span> [ &lt;span style="color:#ae81ff">1&lt;/span> ])
-&lt;span style="color:#a6e22e">|&amp;gt;&lt;/span> (&lt;span style="color:#a6e22e">\&lt;/span>x &lt;span style="color:#a6e22e">-&amp;gt;&lt;/span> &lt;span style="color:#66d9ef">Random&lt;/span>&lt;span style="color:#a6e22e">.&lt;/span>pair x x)
-&lt;span style="color:#a6e22e">|&amp;gt;&lt;/span> &lt;span style="color:#66d9ef">Random&lt;/span>&lt;span style="color:#a6e22e">.&lt;/span>generate &lt;span style="color:#66d9ef">Seed&lt;/span>
 update &lt;span style="color:#a6e22e">:&lt;/span> &lt;span style="color:#66d9ef">Msg&lt;/span> &lt;span style="color:#a6e22e">-&amp;gt;&lt;/span> &lt;span style="color:#66d9ef">Model&lt;/span> &lt;span style="color:#a6e22e">-&amp;gt;&lt;/span> ( &lt;span style="color:#66d9ef">Model&lt;/span>, &lt;span style="color:#66d9ef">Cmd&lt;/span> &lt;span style="color:#66d9ef">Msg&lt;/span> )
 update msg model &lt;span style="color:#a6e22e">=&lt;/span>
 ( model, &lt;span style="color:#66d9ef">Cmd&lt;/span>&lt;span style="color:#a6e22e">.&lt;/span>none )
@@ -433,61 +445,4 @@ cell &lt;span style="color:#f92672">=&lt;/span> cells[i &lt;span style="color:#f
 &lt;span style="color:#ae81ff">2&lt;/span> &lt;span style="color:#ae81ff">7&lt;/span> &lt;span style="color:#ae81ff">6&lt;/span>
 &lt;span style="color:#ae81ff">9&lt;/span> &lt;span style="color:#ae81ff">5&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>
 &lt;span style="color:#ae81ff">4&lt;/span> &lt;span style="color:#ae81ff">3&lt;/span> &lt;span style="color:#ae81ff">8&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>SAT ソルバで CNF 形式で行や列ごとの和の制約を表現するのはめちゃくちゃ大変そうだったけれども、SMT ソルバでこういうふうにできるのであれば結構簡単だ。特に python 向けの z3 は通常の算術演算子が使えて、&lt;code>sum&lt;/code>なども利用できるので直感的に記述できるのが便利。&lt;/p></description></item><item><title>サーバサイドDartのアイデア</title><link>http://example.org/posts/003-serverside-dart/</link><pubDate>Thu, 22 Apr 2021 18:18:03 +0900</pubDate><guid>http://example.org/posts/003-serverside-dart/</guid><description>&lt;p>モバイルアプリ開発において、開発リソースが潤沢でないのであれば Flutter の導入は非常に強力な選択肢となる。じっさい、ここ三年ほどスタートアップにてメインのプロダクトを Flutter で開発していて個人的にはとても気に入っている(Dart への不満はゼロでは無いけれども)。&lt;/p>
-&lt;p>そして、Flutter において個人的に状態管理の肝となっているのは freezed パッケージの存在だ。
-Kotlin の data class のようなものが言語として提供されていないが、昨今の GUI アプリケーションで immutable なデータ構造無しに状態管理をするのは非常に辛いものがある。当初はこういったもの無しでもなんとかやれていたが、アプリケーションの仕様が複雑になるにつれて、こいつの存在は必須になってきた。&lt;/p>
-&lt;p>この freezed 自体は Dart のパッケージとして提供されているので、Flutter 以外でも使うことができる。もしモバイルアプリがサーバと通信するのであれば、サーバサイドも Dart で実装して freezed で作成したエンティティなどを共有すれば、非常に効率よくコードを共有できるのでは無いだろうか。また、抽象化されたアプリケーションロジックを共有することができれば、テストなども効率化できそうな気がする。&lt;/p>
-&lt;p>ということで、Dart の web フレームワークを調べたところ、&lt;a href="https://github.com/stablekernel/aqueduct"target="_blank" rel="noopener noreferrer">aqueduct&lt;/a>
-が一番メジャーっぽかったのだけれども、これが丁度先月あたりにプロジェクトが凍結されてしまっていた。他の web フレームワークはメンテナンスやユーザー数からしてもプロダクトに採用するには少し心許ない。&lt;/p>
-&lt;p>などと漁っていたが、どうやら Dart 公式のミドルウェアフレームワークである&lt;a href="https://github.com/dart-lang/shelf"target="_blank" rel="noopener noreferrer">shelf&lt;/a>
-が非常に使いやすそうである。&lt;a href="https://pub.dev/packages/shelf_router"target="_blank" rel="noopener noreferrer">shelf_router&lt;/a>
-と組み合わせれば、簡単にアプリケーションサーバーを実装できる。&lt;/p>
-&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-dart" data-lang="dart">&lt;span style="color:#66d9ef">import&lt;/span> &lt;span style="color:#e6db74">&amp;#39;package:shelf_router/shelf_router.dart&amp;#39;&lt;/span>;
-&lt;span style="color:#66d9ef">import&lt;/span> &lt;span style="color:#e6db74">&amp;#39;package:shelf/shelf.dart&amp;#39;&lt;/span>;
-&lt;span style="color:#66d9ef">import&lt;/span> &lt;span style="color:#e6db74">&amp;#39;package:shelf/shelf_io.dart&amp;#39;&lt;/span> &lt;span style="color:#66d9ef">as&lt;/span> io;
-&lt;span style="color:#66d9ef">var&lt;/span> app &lt;span style="color:#f92672">=&lt;/span> Router();
-app.&lt;span style="color:#66d9ef">get&lt;/span>(&lt;span style="color:#e6db74">&amp;#39;/hello&amp;#39;&lt;/span>, (Request request) {
-&lt;span style="color:#66d9ef">return&lt;/span> Response.ok(&lt;span style="color:#e6db74">&amp;#39;hello-world&amp;#39;&lt;/span>);
-});
-app.&lt;span style="color:#66d9ef">get&lt;/span>(&lt;span style="color:#e6db74">&amp;#39;/user/&amp;lt;user&amp;gt;&amp;#39;&lt;/span>, (Request request, &lt;span style="color:#66d9ef">String&lt;/span> user) {
-&lt;span style="color:#66d9ef">return&lt;/span> Response.ok(&lt;span style="color:#e6db74">&amp;#39;hello &lt;/span>&lt;span style="color:#e6db74">$&lt;/span>user&lt;span style="color:#e6db74">&amp;#39;&lt;/span>);
-});
-&lt;span style="color:#66d9ef">var&lt;/span> server &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#66d9ef">await&lt;/span> io.serve(app.handler, &lt;span style="color:#e6db74">&amp;#39;localhost&amp;#39;&lt;/span>, &lt;span style="color:#ae81ff">8080&lt;/span>);
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>試してみたところ、deno の oak や php の slim のような感じだ。モバイルアプリで RESTful api をリクエストするような用途であれば十分だろう。
-それとこの Shelf、ミドルウェアを自作するのも容易なので、&lt;/p>
-&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-dart" data-lang="dart">&lt;span style="color:#66d9ef">import&lt;/span> &lt;span style="color:#e6db74">&amp;#39;package:shelf/shelf.dart&amp;#39;&lt;/span>;
-Middleware auth() &lt;span style="color:#f92672">=&amp;gt;&lt;/span> (innerHandler) {
-&lt;span style="color:#66d9ef">return&lt;/span> (request) &lt;span style="color:#66d9ef">async&lt;/span> {
-&lt;span style="color:#66d9ef">if&lt;/span>(&lt;span style="color:#960050;background-color:#1e0010">認証失敗&lt;/span>) {
-&lt;span style="color:#66d9ef">return&lt;/span> Response(&lt;span style="color:#ae81ff">401&lt;/span>, body: &lt;span style="color:#e6db74">&amp;#39;FORBIDDEN&amp;#39;&lt;/span>);
-}
-&lt;span style="color:#66d9ef">final&lt;/span> response &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#66d9ef">await&lt;/span> innerHandler(request);
-&lt;span style="color:#66d9ef">return&lt;/span> response;
-};
-};
-&lt;span style="color:#66d9ef">final&lt;/span> handler &lt;span style="color:#f92672">=&lt;/span>
-&lt;span style="color:#66d9ef">const&lt;/span> Pipeline().addMiddleware(auth()).addHandler(router());
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>のように色々追加できる。
-あとはこんな感じでプロダクトを分割すれば良さそう。&lt;/p>
-&lt;table>
-&lt;thead>
-&lt;tr>
-&lt;th>package&lt;/th>
-&lt;th>概要&lt;/th>
-&lt;/tr>
-&lt;/thead>
-&lt;tbody>
-&lt;tr>
-&lt;td>core&lt;/td>
-&lt;td>entity, application logic やリポジトリなどのインタフェース&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>client&lt;/td>
-&lt;td>Flutter アプリ。アプリケーションロジックは core を使う。またリポジトリに server を指定する&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>server&lt;/td>
-&lt;td>アプリケーションサーバー。アプリケーションロジックは core を使う。リポジトリは DB などを使う&lt;/td>
-&lt;/tr>
-&lt;/tbody>
-&lt;/table></description></item></channel></rss>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>SAT ソルバで CNF 形式で行や列ごとの和の制約を表現するのはめちゃくちゃ大変そうだったけれども、SMT ソルバでこういうふうにできるのであれば結構簡単だ。特に python 向けの z3 は通常の算術演算子が使えて、&lt;code>sum&lt;/code>なども利用できるので直感的に記述できるのが便利。&lt;/p></description></item></channel></rss>

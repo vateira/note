@@ -7,8 +7,6 @@
 <span style=color:#f92672>import </span><span style=color:#a6e22e>Html</span> <span style=color:#66d9ef>as</span> <span style=color:#66d9ef>H</span> exposing (<span style=color:#66d9ef>Html</span>)
 <span style=color:#f92672>import </span><span style=color:#a6e22e>Html.Attributes</span> exposing (style)
 <span style=color:#f92672>import </span><span style=color:#a6e22e>List.Extra</span> <span style=color:#66d9ef>as</span> <span style=color:#66d9ef>List</span>
-<span style=color:#f92672>import </span><span style=color:#a6e22e>Random</span>
-<span style=color:#f92672>import </span><span style=color:#a6e22e>Random.Extra.List</span> <span style=color:#66d9ef>as</span> <span style=color:#66d9ef>RandomList</span>
 <span style=color:#f92672>import </span><span style=color:#a6e22e>Sat</span>
 
 
@@ -23,7 +21,7 @@
 <span style=color:#66d9ef>main </span><span style=color:#a6e22e>:</span> <span style=color:#66d9ef>Program</span> () <span style=color:#66d9ef>Model</span> <span style=color:#66d9ef>Msg</span>
 <span style=color:#66d9ef>main </span><span style=color:#a6e22e>=</span>
     <span style=color:#66d9ef>Browser</span><span style=color:#a6e22e>.</span>element
-        { init <span style=color:#a6e22e>=</span> <span style=color:#a6e22e>\</span>_ <span style=color:#a6e22e>-&gt;</span> ( [], init )
+        { init <span style=color:#a6e22e>=</span> <span style=color:#a6e22e>\</span>_ <span style=color:#a6e22e>-&gt;</span> ( cnf, <span style=color:#66d9ef>Cmd</span><span style=color:#a6e22e>.</span>none )
         , view <span style=color:#a6e22e>=</span>
             <span style=color:#a6e22e>\</span>code <span style=color:#a6e22e>-&gt;</span>
                 sudoku code
@@ -32,13 +30,6 @@
         }
 
 
-init <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>Cmd</span> <span style=color:#66d9ef>Msg</span>
-init <span style=color:#a6e22e>=</span>
-    <span style=color:#66d9ef>List</span><span style=color:#a6e22e>.</span>range <span style=color:#ae81ff>2</span> <span style=color:#ae81ff>9</span>
-        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>RandomList</span><span style=color:#a6e22e>.</span>shuffle
-        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>Random</span><span style=color:#a6e22e>.</span>map (<span style=color:#a6e22e>(++)</span> [ <span style=color:#ae81ff>1</span> ])
-        <span style=color:#a6e22e>|&gt;</span> (<span style=color:#a6e22e>\</span>x <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>Random</span><span style=color:#a6e22e>.</span>pair x x)
-        <span style=color:#a6e22e>|&gt;</span> <span style=color:#66d9ef>Random</span><span style=color:#a6e22e>.</span>generate <span style=color:#66d9ef>Seed</span>
 
 
 update <span style=color:#a6e22e>:</span> <span style=color:#66d9ef>Msg</span> <span style=color:#a6e22e>-&gt;</span> <span style=color:#66d9ef>Model</span> <span style=color:#a6e22e>-&gt;</span> ( <span style=color:#66d9ef>Model</span>, <span style=color:#66d9ef>Cmd</span> <span style=color:#66d9ef>Msg</span> )
