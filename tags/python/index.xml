@@ -1,4 +1,35 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>python on vateira</title><link>http://example.org/tags/python/</link><description>Recent content in python on vateira</description><generator>Hugo -- gohugo.io</generator><language>ja_jp</language><lastBuildDate>Mon, 17 May 2021 22:22:29 +0900</lastBuildDate><atom:link href="http://example.org/tags/python/index.xml" rel="self" type="application/rss+xml"/><item><title>ProcesingのPythonモードでデコレータを使う</title><link>http://example.org/posts/013-procesing-python/</link><pubDate>Mon, 17 May 2021 22:22:29 +0900</pubDate><guid>http://example.org/posts/013-procesing-python/</guid><description>&lt;p>久々に Processing でアニメーションとかを考えてみようと思ったところ、python モードがあることを思い出したの使ってみる。&lt;/p>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>python on vateira</title><link>http://example.org/tags/python/</link><description>Recent content in python on vateira</description><generator>Hugo -- gohugo.io</generator><language>ja_jp</language><lastBuildDate>Mon, 17 May 2021 22:22:29 +0900</lastBuildDate><atom:link href="http://example.org/tags/python/index.xml" rel="self" type="application/rss+xml"/><item><title>denoでトイ言語</title><link>http://example.org/posts/014-toylang/</link><pubDate>Thu, 27 May 2021 16:07:22 +0900</pubDate><guid>http://example.org/posts/014-toylang/</guid><description>&lt;p>ハイキングに行く予定が雨だったので、勉強に作った。&lt;/p>
+&lt;p>&lt;a href="https://github.com/vateira/sailang">https://github.com/vateira/sailang&lt;/a>&lt;/p>
+&lt;p>LR(1)パーサ。&lt;/p>
+&lt;pre>&lt;code>-- test program
+let x := 10;
+let f := \x y -&amp;gt;
+x + y;
+let max := \a b -&amp;gt;
+if a &amp;gt; b then a else b;
+let min := \a b -&amp;gt;
+if a &amp;lt; b then a else b;
+let show := \a s -&amp;gt;
+if a = 0 then
+print 0
+else
+{ print s;
+show (a - 1) s
+};
+print f 3 (3 + 5);
+print (max 1 3);
+print min 4 2;
+show 3 1
+&lt;/code>&lt;/pre>&lt;p>実行結果&lt;/p>
+&lt;pre>&lt;code>11
+3
+2
+1
+1
+1
+0
+&lt;/code>&lt;/pre>&lt;p>色々不具合あるだろうけど、とりあえず最低限の機能はできた。
+再帰でループしようとしたけど、800 回ほどでスタックオーバーフロー。&lt;/p></description></item><item><title>ProcesingのPythonモードでデコレータを使う</title><link>http://example.org/posts/013-procesing-python/</link><pubDate>Mon, 17 May 2021 22:22:29 +0900</pubDate><guid>http://example.org/posts/013-procesing-python/</guid><description>&lt;p>久々に Processing でアニメーションとかを考えてみようと思ったところ、python モードがあることを思い出したの使ってみる。&lt;/p>
 &lt;p>Python モードを試したのは、学生の頃に授業で触った時は Java で書いていたけれども、ここ数年 Java から遠ざかっていたのが大きい。それと、複数のアニメーションを一定の時間毎に切り替えるのにデコレータが使えるかなと思ったから。&lt;/p>
 &lt;p>(このあたり Processing で正式な方法があるのかもしれないけど)&lt;/p>
 &lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-python" data-lang="python">kFrameRate &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#ae81ff">60&lt;/span>
@@ -384,65 +415,4 @@ Pipeable(&lt;span style="color:#ae81ff">10&lt;/span>)
 &lt;span style="color:#f92672">&amp;gt;&amp;gt;&lt;/span> ((x) &lt;span style="color:#f92672">=&amp;gt;&lt;/span> print(x))
 ;
 }
-&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>SMTソルバ(z3)で魔方陣を解く</title><link>http://example.org/posts/004-magic-square/</link><pubDate>Fri, 23 Apr 2021 07:31:39 +0900</pubDate><guid>http://example.org/posts/004-magic-square/</guid><description>&lt;p>minisat で魔方陣を解こうかと思ったけれども、CNF で和の制約を書くのが大変そうだったので SMT ソルバを使って解く。&lt;/p>
-&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-sh" data-lang="sh">% pip install z3-solver
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>あとはスクリプトを書くだけ。&lt;/p>
-&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-python:magic-square.py" data-lang="python:magic-square.py">&lt;span style="color:#f92672">from&lt;/span> z3 &lt;span style="color:#f92672">import&lt;/span> &lt;span style="color:#f92672">*&lt;/span>
-solver &lt;span style="color:#f92672">=&lt;/span> Solver()
-&lt;span style="color:#75715e"># 5 * 5 の魔方陣を扱う&lt;/span>
-size &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#ae81ff">5&lt;/span>
-&lt;span style="color:#75715e"># 各行,列,対角線の和&lt;/span>
-summary &lt;span style="color:#f92672">=&lt;/span> ((size &lt;span style="color:#f92672">**&lt;/span> &lt;span style="color:#ae81ff">2&lt;/span> &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>) &lt;span style="color:#f92672">*&lt;/span> size) &lt;span style="color:#f92672">/&lt;/span> &lt;span style="color:#ae81ff">2&lt;/span>
-&lt;span style="color:#75715e"># 0〜n^2の変数を用意する&lt;/span>
-cells &lt;span style="color:#f92672">=&lt;/span> [Int(&lt;span style="color:#e6db74">&amp;#34;c[&lt;/span>&lt;span style="color:#e6db74">%d&lt;/span>&lt;span style="color:#e6db74">]&amp;#34;&lt;/span> &lt;span style="color:#f92672">%&lt;/span> x) &lt;span style="color:#66d9ef">for&lt;/span> x &lt;span style="color:#f92672">in&lt;/span> range(size &lt;span style="color:#f92672">**&lt;/span> &lt;span style="color:#ae81ff">2&lt;/span>)]
-&lt;span style="color:#75715e"># 各セルは1〜n^2の数字が入る&lt;/span>
-&lt;span style="color:#66d9ef">for&lt;/span> x &lt;span style="color:#f92672">in&lt;/span> range(size &lt;span style="color:#f92672">**&lt;/span> &lt;span style="color:#ae81ff">2&lt;/span>):
-solver&lt;span style="color:#f92672">.&lt;/span>add(&lt;span style="color:#ae81ff">1&lt;/span> &lt;span style="color:#f92672">&amp;lt;=&lt;/span> cells[x], cells[x] &lt;span style="color:#f92672">&amp;lt;=&lt;/span> size &lt;span style="color:#f92672">**&lt;/span> &lt;span style="color:#ae81ff">2&lt;/span>)
-&lt;span style="color:#75715e"># それぞれの数字は一度のみ現れる&lt;/span>
-solver&lt;span style="color:#f92672">.&lt;/span>add(Distinct(cells))
-&lt;span style="color:#75715e"># 各行の和はsummaryになる&lt;/span>
-&lt;span style="color:#66d9ef">for&lt;/span> i &lt;span style="color:#f92672">in&lt;/span> range(size):
-rows &lt;span style="color:#f92672">=&lt;/span> [cells[i &lt;span style="color:#f92672">*&lt;/span> size &lt;span style="color:#f92672">+&lt;/span> x] &lt;span style="color:#66d9ef">for&lt;/span> x &lt;span style="color:#f92672">in&lt;/span> range(size)]
-solver&lt;span style="color:#f92672">.&lt;/span>add(sum(rows) &lt;span style="color:#f92672">==&lt;/span> summary)
-&lt;span style="color:#75715e"># 各列の和はsummaryになる&lt;/span>
-&lt;span style="color:#66d9ef">for&lt;/span> i &lt;span style="color:#f92672">in&lt;/span> range(size):
-cols &lt;span style="color:#f92672">=&lt;/span> [cells[x &lt;span style="color:#f92672">*&lt;/span> size &lt;span style="color:#f92672">+&lt;/span> i] &lt;span style="color:#66d9ef">for&lt;/span> x &lt;span style="color:#f92672">in&lt;/span> range(size)]
-solver&lt;span style="color:#f92672">.&lt;/span>add(sum(cols) &lt;span style="color:#f92672">==&lt;/span> summary)
-&lt;span style="color:#75715e"># 対角線1の和はsummaryになる&lt;/span>
-dia1 &lt;span style="color:#f92672">=&lt;/span> [cells[x &lt;span style="color:#f92672">*&lt;/span> size &lt;span style="color:#f92672">+&lt;/span> x] &lt;span style="color:#66d9ef">for&lt;/span> x &lt;span style="color:#f92672">in&lt;/span> range(size)]
-solver&lt;span style="color:#f92672">.&lt;/span>add(sum(dia1) &lt;span style="color:#f92672">==&lt;/span> summary)
-&lt;span style="color:#75715e"># 対角線2の和はsummaryになる&lt;/span>
-dia2 &lt;span style="color:#f92672">=&lt;/span> [cells[(x &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>) &lt;span style="color:#f92672">*&lt;/span> (size &lt;span style="color:#f92672">-&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>)] &lt;span style="color:#66d9ef">for&lt;/span> x &lt;span style="color:#f92672">in&lt;/span> range(size)]
-solver&lt;span style="color:#f92672">.&lt;/span>add(sum(dia2) &lt;span style="color:#f92672">==&lt;/span> summary)
-&lt;span style="color:#75715e"># 予めセルに何か指定しておく&lt;/span>
-solver&lt;span style="color:#f92672">.&lt;/span>add(cells[&lt;span style="color:#ae81ff">0&lt;/span>] &lt;span style="color:#f92672">==&lt;/span> &lt;span style="color:#ae81ff">10&lt;/span>)
-solver&lt;span style="color:#f92672">.&lt;/span>add(cells[&lt;span style="color:#ae81ff">12&lt;/span>] &lt;span style="color:#f92672">==&lt;/span> &lt;span style="color:#ae81ff">13&lt;/span>)
-&lt;span style="color:#75715e"># 解を求める&lt;/span>
-solver&lt;span style="color:#f92672">.&lt;/span>check()
-&lt;span style="color:#75715e"># 表示&lt;/span>
-model &lt;span style="color:#f92672">=&lt;/span> solver&lt;span style="color:#f92672">.&lt;/span>model()
-&lt;span style="color:#66d9ef">for&lt;/span> i &lt;span style="color:#f92672">in&lt;/span> range(size):
-&lt;span style="color:#66d9ef">for&lt;/span> j &lt;span style="color:#f92672">in&lt;/span> range(size):
-cell &lt;span style="color:#f92672">=&lt;/span> cells[i &lt;span style="color:#f92672">*&lt;/span> size &lt;span style="color:#f92672">+&lt;/span> j]
-&lt;span style="color:#66d9ef">print&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;&lt;/span>&lt;span style="color:#e6db74">%d&lt;/span>&lt;span style="color:#ae81ff">\t&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span> &lt;span style="color:#f92672">%&lt;/span> model[cell]&lt;span style="color:#f92672">.&lt;/span>as_long(), end&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&amp;#34;&lt;/span>)
-&lt;span style="color:#66d9ef">print&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;&amp;#34;&lt;/span>)
-&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-sh" data-lang="sh">% python3 ./magic_square.py
-&lt;span style="color:#ae81ff">10&lt;/span> &lt;span style="color:#ae81ff">22&lt;/span> &lt;span style="color:#ae81ff">17&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span> &lt;span style="color:#ae81ff">15&lt;/span>
-&lt;span style="color:#ae81ff">6&lt;/span> &lt;span style="color:#ae81ff">16&lt;/span> &lt;span style="color:#ae81ff">7&lt;/span> &lt;span style="color:#ae81ff">11&lt;/span> &lt;span style="color:#ae81ff">25&lt;/span>
-&lt;span style="color:#ae81ff">24&lt;/span> &lt;span style="color:#ae81ff">2&lt;/span> &lt;span style="color:#ae81ff">13&lt;/span> &lt;span style="color:#ae81ff">18&lt;/span> &lt;span style="color:#ae81ff">8&lt;/span>
-&lt;span style="color:#ae81ff">4&lt;/span> &lt;span style="color:#ae81ff">5&lt;/span> &lt;span style="color:#ae81ff">19&lt;/span> &lt;span style="color:#ae81ff">23&lt;/span> &lt;span style="color:#ae81ff">14&lt;/span>
-&lt;span style="color:#ae81ff">21&lt;/span> &lt;span style="color:#ae81ff">20&lt;/span> &lt;span style="color:#ae81ff">9&lt;/span> &lt;span style="color:#ae81ff">12&lt;/span> &lt;span style="color:#ae81ff">3&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>今回は 5 * 5 の魔方陣用に作成したけれども、size を変更して具体的な値の制約を削除または変更すればそれ以外の大きさの魔方陣にも対応できる。&lt;/p>
-&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-diff" data-lang="diff">&lt;span style="color:#f92672">- # 5 * 5 の魔方陣を扱う
-&lt;/span>&lt;span style="color:#f92672">&lt;/span>&lt;span style="color:#a6e22e">+ # 3 * 3 の魔方陣を扱う
-&lt;/span>&lt;span style="color:#a6e22e">&lt;/span>&lt;span style="color:#f92672">- size = 5
-&lt;/span>&lt;span style="color:#f92672">&lt;/span>&lt;span style="color:#a6e22e">+ size = 3
-&lt;/span>&lt;span style="color:#a6e22e">&lt;/span>
-&lt;span style="color:#f92672">- # 予めセルに何か指定しておく
-&lt;/span>&lt;span style="color:#f92672">- solver.add(cells[0] == 10)
-&lt;/span>&lt;span style="color:#f92672">- solver.add(cells[12] == 13)
-&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-sh" data-lang="sh">% python3 ./magic_square.py
-&lt;span style="color:#ae81ff">2&lt;/span> &lt;span style="color:#ae81ff">7&lt;/span> &lt;span style="color:#ae81ff">6&lt;/span>
-&lt;span style="color:#ae81ff">9&lt;/span> &lt;span style="color:#ae81ff">5&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>
-&lt;span style="color:#ae81ff">4&lt;/span> &lt;span style="color:#ae81ff">3&lt;/span> &lt;span style="color:#ae81ff">8&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>SAT ソルバで CNF 形式で行や列ごとの和の制約を表現するのはめちゃくちゃ大変そうだったけれども、SMT ソルバでこういうふうにできるのであれば結構簡単だ。特に python 向けの z3 は通常の算術演算子が使えて、&lt;code>sum&lt;/code>なども利用できるので直感的に記述できるのが便利。&lt;/p></description></item></channel></rss>
+&lt;/code>&lt;/pre>&lt;/div></description></item></channel></rss>
